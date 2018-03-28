@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link rel="stylesheet" href="assets/css/styles.css">
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+	<body oncontextmenu="return false;">
+		<div class="game_container">
+			<div class="mine_field"></div>
+		</div>
+	</body>
+	<script>
+		var array_of_blocks = [];
+
+		generate_field();
+		
+		function generate_field() {
+			var block_types = ["empty", "bomb", "hint"];
+
+			for (var i = 1; i < 82; i++) {
+				var mine_field = $('.mine_field');
+				var new_block_div = $('<div>');
+				var new_block_object = {block_state: "not_clicked",
+										block_type: block_types[Math.floor(Math.random() * block_types.length)]};
+
+				array_of_blocks.push(new_block_object);
+
+				new_block_div
+					.data('state', new_block_object.block_state)
+					.data('type', new_block_object.block_type)
+					.addClass('block')
+					.css('background-image', `url(assets/images/${new_block_object.block_state}.png)`);
+
+				mine_field.append(new_block_div);
+			}
+		}
+		
+		$('.block').mousedown(function(event) {
+			switch (event.which) {
+				case 1:
+					if ($(this).data('state') === "not_clicked")
+						$(this)
+							.data('state', 'clicked')
+							.css('background-image', `url(assets/images/clicked.png)`);
+					
+					//check_for_mines($(this));
+					
+					break;
+				case 2:
+					console.log("your scroll wheel button has no use here");
+					
+					break;
+				case 3:
+					if ($(this).data('state') === "not_clicked")
+						$(this)
+							.data('state', 'flagged')
+							.css('background-image', `url(assets/images/flagged.png)`);
+					else if ($(this).data('state') === "flagged")
+						$(this)
+							.data('state', 'not_clicked')
+							.css('background-image', `url(assets/images/not_clicked.png)`);
+					
+					break;
+				default:
+					console("how'd you manage to see this message? what kind of mouse is that?");
+			}
+		});
+	</script>
+</html>
