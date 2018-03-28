@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="assets/css/styles.css">
-		
+
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	</head>
 	<body oncontextmenu="return false;">
@@ -17,7 +17,7 @@
 
 		//start field generation
 		generate_field();
-		
+
 		//field generation function
 		function generate_field() {
 			//array of block types
@@ -47,7 +47,7 @@
 				mine_field.append(new_block_div);
 			}
 		}
-		
+
 		//when a div with the class 'block' is clicked on
 		$('.block').mousedown(function(event) {
 			switch (event.which) {
@@ -58,17 +58,17 @@
 						$(this)
 							.data('state', 'clicked')
 							.css('background-image', `url(assets/images/clicked.png)`);
-					
+
 					//I'm thinking here we should call a method that checks if the clicked block was a mine
 					//and perform the empty block crawl
 					//example: check_for_mines($(this));
 					//
-					
+
 					break;
 				case 2:
 					//case for middle click (not used)
 					console.log("your scroll wheel button has no use here");
-					
+
 					break;
 				case 3:
 					//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
@@ -83,10 +83,10 @@
 						$(this)
 							.data('state', 'not_clicked')
 							.css('background-image', `url(assets/images/not_clicked.png)`);
-					
+
 					break;
 				default:
-					//default case
+					//default case (also not used)
 					console("how'd you manage to see this message? what kind of mouse is that?");
 			}
 		});
