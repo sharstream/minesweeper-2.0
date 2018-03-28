@@ -57,7 +57,7 @@
 						//set its data-state attribute to 'clicked' and change the background image of the block
 						$(this)
 							.data('state', 'clicked')
-							.css('background-image', `url(assets/images/clicked.png)`);
+							.css('background-image', 'url(assets/images/clicked.png)');
 
 					//I'm thinking here we should call a method that checks if the clicked block was a mine
 					//and perform the empty block crawl
@@ -76,13 +76,13 @@
 						//set its data-state attribute to 'flagged' and change the background image of the block
 						$(this)
 							.data('state', 'flagged')
-							.css('background-image', `url(assets/images/flagged.png)`);
+							.css('background-image', 'url(assets/images/flagged.png)');
 					//if the clicked block's data-state attribute is already 'flagged'
 					else if ($(this).data('state') === "flagged")
 						//set its data-state attribute to 'not_clicked' and change the background image
 						$(this)
 							.data('state', 'not_clicked')
-							.css('background-image', `url(assets/images/not_clicked.png)`);
+							.css('background-image', 'url(assets/images/not_clicked.png)');
 
 					break;
 				default:
