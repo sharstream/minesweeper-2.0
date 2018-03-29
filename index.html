@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link rel="stylesheet" href="assets/css/styles.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+	<body oncontextmenu="return false;">
+		<div class="game_container">
+			<div class="mine_field"></div>
+		</div>
+	</body>
+	<script>
+		//array to store all the block objects in the mine_field container
+		var array_of_blocks = [];
+
+		//start field generation
+		generate_field();
+
+		//field generation function
+		function generate_field() {
+			//array of block types
+			var block_types = ["empty", "bomb", "hint"];
+
+			//generate 81 blocks (9 x 9 grid)
+			for (var i = 1; i < 82; i++) {
+				//reference to the mine_field container
+				var mine_field = $('.mine_field');
+				//creating a new block element
+				var new_block_div = $('<div>');
+				//creating a new block object with default block_state and random block_type values
+				var new_block_object = {block_state: "not_clicked",
+										block_type: block_types[Math.floor(Math.random() * block_types.length)]};
+
+				//push the new block to our block array
+				array_of_blocks.push(new_block_object);
+
+				//set data-state, data-type, class attributes, and background image of the new block element
+				new_block_div
+					.data('state', new_block_object.block_state)
+					.data('type', new_block_object.block_type)
+					.addClass('block')
+					.css('background-image', `url(assets/images/${new_block_object.block_state}.png)`);
+
+				//and append the new block element to the mine_field container
+				mine_field.append(new_block_div);
+			}
+		}
+
+		//when a div with the class 'block' is clicked on
+		$('.block').mousedown(function(event) {
+			switch (event.which) {
+				case 1:
+					//if it was a left click and the clicked block's data-state attribute is 'not_clicked'
+					if ($(this).data('state') === "not_clicked")
+						//set its data-state attribute to 'clicked' and change the background image of the block
+						$(this)
+							.data('state', 'clicked')
+							.css('background-image', 'url(assets/images/clicked.png)');
+
+					//I'm thinking here we should call a method that checks if the clicked block was a mine
+					//and perform the empty block crawl
+					//example: check_for_mines($(this));
+					//
+
+					break;
+				case 2:
+					//case for middle click (not used)
+					console.log("your scroll wheel button has no use here");
+
+					break;
+				case 3:
+					//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
+					if ($(this).data('state') === "not_clicked")
+						//set its data-state attribute to 'flagged' and change the background image of the block
+						$(this)
+							.data('state', 'flagged')
+							.css('background-image', 'url(assets/images/flagged.png)');
+					//if the clicked block's data-state attribute is already 'flagged'
+					else if ($(this).data('state') === "flagged")
+						//set its data-state attribute to 'not_clicked' and change the background image
+						$(this)
+							.data('state', 'not_clicked')
+							.css('background-image', 'url(assets/images/not_clicked.png)');
+
+					break;
+				default:
+					//default case (also not used)
+					console("how'd you manage to see this message? what kind of mouse is that?");
+			}
+		});
+	</script>
+</html>

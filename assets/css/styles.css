@@ -1,0 +1,21 @@
+body {
+	margin: auto;
+	padding: 0;
+}
+
+.block {
+	height: 20px;
+	width: 20px;
+}
+
+.game_container {
+	margin: auto;
+	width: 180px;
+}
+
+.mine_field {
+	display: inline-flex;
+	flex-wrap: wrap;
+	text-align: center;
+	margin: auto;
+}
