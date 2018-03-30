@@ -15,7 +15,7 @@
 		//array to store all the block objects in the mine_field container
 
 		var array_of_blocks = [[],[]];
-
+		var block_bombs = [];
 		//start field generation
 		generate_field();
 
@@ -47,7 +47,8 @@
 				//creating a new block object with default block_state and random block_type values
 				var new_block_object = {block_state: "not_clicked",
 										block_type: block_types[Math.floor(Math.random() * block_types.length)],
-										block_coordinates: temp_coordinates};
+										block_coordinates: temp_coordinates,
+										setAdjacentBombs:0};
 				
 				if (index_x % 9 === 0) {
 					index_x = 0;
@@ -72,8 +73,41 @@
 
 				index_x++;
 			}
+			block_bombs = bomb_blocks(array_of_blocks);
+			console.log(block_bombs);
 			console.log(array_of_blocks);		
 		}
+		//needs to optimize too many loops
+		function countAdjacentMines(){        
+			for (var i = 0; i < array_of_blocks.length; i++){
+				for (var j = 0; j < array_of_blocks.length; j++){
+					if (!(array_of_blocks[i][j].block_type.bomb)){
+						var count = 0;
+
+						for (var p = i - 1; p <= i + 1; p++){
+							for (var q = j - 1; q <= j + 1; q++){
+								if (0 <= p && p < array_of_blocks.length && 0 <= q && q < array_of_blocks.length){
+									if (array_of_blocks[p][q].block_type.bomb)
+										++count;
+								}
+							}
+						}
+
+						array_of_blocks[i][j].setAdjacentBombs(count);
+					}
+				} // end for loop rows
+			} // end for loop columns
+		} // end countAdjacentMines
+
+		function bomb_blocks(list) {
+			var bomb_blocks = [];
+			list.foreach(function (item) {
+				if (item.block_type.bomb !== '') {
+					bomb_blocks.push(item.block_type.bomb);
+				}
+			});
+			return bomb_blocks;
+		};
 
 		//when a div with the class 'block' is clicked on
 		$('.block').mousedown(function(event) {
