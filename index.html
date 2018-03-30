@@ -14,65 +14,68 @@
 	<script>
 		//array to store all the block objects in the mine_field container
 
-		var array_of_blocks = [[],[]];
+		var array_of_blocks = [];
+		var number_of_bombs = 0;
+		var number_of_flagged_blocks = 0;
 
 		//start field generation
 		generate_field();
 
 		//field generation function
 		function generate_field() {
-			//array of block types
-			debugger
-			var block_types = ["empty", "bomb", "hint"];
-			var index_x = 0;
-			var index_y = 0; 
-
-			// for (let index = 0; index < 81; index++) {
-			// 	array_of_blocks[index] = [];
-			// }
-			var temp_coordinates = {
-				"x": 0,
-				"y": 0
-			};
+			//array of block types, coordinate variables, and temp_coordinates object
+			var block_types = ["empty", "bomb"];
+			var index_x = 0, index_y = 0; 
+			var temp_coordinates = { "x": 0, "y": 0 };
+			var temp_block_type = "";
 			
 			//generate 81 blocks (9 x 9 grid)
 			for (var i = 1; i < 82; i++) {
-				temp_coordinates['x'] = index_x;
-				temp_coordinates['y'] = index_y;
+				//set temporary block coordinates (to be overwritten every iteration of block creation loop)
+				temp_coordinates['x'] = index_x + 1;
+				temp_coordinates['y'] = index_y + 1;
+				//set temporary block type (will need some kind of algorithm to limit number of bombs
+				//and make sure they are evenly spread throughout the field)
+				temp_block_type = block_types[Math.floor(Math.random() * block_types.length)];
+				
 				//reference to the mine_field container
-
 				var mine_field = $('.mine_field');
 				//creating a new block element
 				var new_block_div = $('<div>');
+				
 				//creating a new block object with default block_state and random block_type values
 				var new_block_object = {block_state: "not_clicked",
-										block_type: block_types[Math.floor(Math.random() * block_types.length)],
-										block_coordinates: temp_coordinates};
+										block_type: temp_block_type,
+										block_coordinate_x: temp_coordinates['x'],
+										block_coordinate_y: temp_coordinates['y']};
 				
-				if (index_x % 9 === 0) {
-					index_x = 0;
-					index_y++;
-				}
-				// array_of_blocks[index_x-1] = [];
-				
-				// array_of_blocks[index_x][index_y] = new_block_object.block_coordinates;
-				//push the new block to our block array
-				// arry.push([value_1, value2]);
+				//push new blocks object to array
 				array_of_blocks.push(new_block_object);
 				
-				//set data-state, data-type, class attributes, and background image of the new block element
+				//set data-state, data-type, class & id attributes, and background image of the new block element
 				new_block_div
 					.data('state', new_block_object.block_state)
 					.data('type', new_block_object.block_type)
+					.attr('id', `${temp_coordinates['x']}` + "-" + `${temp_coordinates['y']}`)
 					.addClass('block')
 					.css('background-image', `url(assets/images/${new_block_object.block_state}.png)`);
 
 				//and append the new block element to the mine_field container
 				mine_field.append(new_block_div);
 
+				//increment index_x
 				index_x++;
+				
+				//unless index_x divided by 9 has a remainder of 0 (end of row)
+				if (index_x % 9 === 0) {
+					//then reset index_x and increment index_y (new row)
+					index_x = 0;
+					index_y++;
+				}
 			}
-			console.log(array_of_blocks);		
+		
+			//testing purposes
+			//console.log(array_of_blocks);		
 		}
 
 		//when a div with the class 'block' is clicked on
@@ -86,10 +89,14 @@
 							.data('state', 'clicked')
 							.css('background-image', 'url(assets/images/clicked.png)');
 
-					//I'm thinking here we should call a method that checks if the clicked block was a mine
-					//and perform the empty block crawl
-					//example: check_for_mines($(this));
-					//
+					//determine if we clicked block was bomb
+					//or if we should perform the empty block crawl
+					//example below:
+					if ($(this).data('type') === "bomb")
+						console.log("a bomb block was clicked!! - perform_bomb_clicked_method() " + "--- the bomb's coordinates were " + $(this).attr('id'));
+					else if ($(this).data('type') === "empty")
+						console.log("an empty block was clicked - perform_the_empty_area_crawl_method() " + "--- the clicked block's coordinates were " + $(this).attr('id'));
+					
 
 					break;
 				case 2:
@@ -99,17 +106,23 @@
 					break;
 				case 3:
 					//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
-					if ($(this).data('state') === "not_clicked")
+					if ($(this).data('state') === "not_clicked") {
+						number_of_flagged_blocks++;
+						
 						//set its data-state attribute to 'flagged' and change the background image of the block
 						$(this)
 							.data('state', 'flagged')
 							.css('background-image', 'url(assets/images/flagged.png)');
+					}
 					//if the clicked block's data-state attribute is already 'flagged'
-					else if ($(this).data('state') === "flagged")
+					else if ($(this).data('state') === "flagged") {
+						number_of_flagged_blocks--;
+						
 						//set its data-state attribute to 'not_clicked' and change the background image
 						$(this)
 							.data('state', 'not_clicked')
 							.css('background-image', 'url(assets/images/not_clicked.png)');
+					}
 
 					break;
 				default:
