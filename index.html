@@ -13,7 +13,8 @@
 	</body>
 	<script>
 		//array to store all the block objects in the mine_field container
-		var array_of_blocks = [];
+
+		var array_of_blocks = [[],[]];
 
 		//start field generation
 		generate_field();
@@ -21,21 +22,44 @@
 		//field generation function
 		function generate_field() {
 			//array of block types
+			debugger
 			var block_types = ["empty", "bomb", "hint"];
+			var index_x = 0;
+			var index_y = 0; 
 
+			// for (let index = 0; index < 81; index++) {
+			// 	array_of_blocks[index] = [];
+			// }
+			var temp_coordinates = {
+				"x": 0,
+				"y": 0
+			};
+			
 			//generate 81 blocks (9 x 9 grid)
 			for (var i = 1; i < 82; i++) {
+				temp_coordinates['x'] = index_x;
+				temp_coordinates['y'] = index_y;
 				//reference to the mine_field container
+
 				var mine_field = $('.mine_field');
 				//creating a new block element
 				var new_block_div = $('<div>');
 				//creating a new block object with default block_state and random block_type values
 				var new_block_object = {block_state: "not_clicked",
-										block_type: block_types[Math.floor(Math.random() * block_types.length)]};
-
+										block_type: block_types[Math.floor(Math.random() * block_types.length)],
+										block_coordinates: temp_coordinates};
+				
+				if (index_x % 9 === 0) {
+					index_x = 0;
+					index_y++;
+				}
+				// array_of_blocks[index_x-1] = [];
+				
+				// array_of_blocks[index_x][index_y] = new_block_object.block_coordinates;
 				//push the new block to our block array
+				// arry.push([value_1, value2]);
 				array_of_blocks.push(new_block_object);
-
+				
 				//set data-state, data-type, class attributes, and background image of the new block element
 				new_block_div
 					.data('state', new_block_object.block_state)
@@ -45,7 +69,10 @@
 
 				//and append the new block element to the mine_field container
 				mine_field.append(new_block_div);
+
+				index_x++;
 			}
+			console.log(array_of_blocks);		
 		}
 
 		//when a div with the class 'block' is clicked on
