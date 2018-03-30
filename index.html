@@ -13,11 +13,10 @@
 	</body>
 	<script>
 		//array to store all the block objects in the mine_field container
-
 		var array_of_blocks = [];
 		var number_of_bombs = 0;
 		var number_of_flagged_blocks = 0;
-
+		var block_bombs = [];
 		//start field generation
 		generate_field();
 
@@ -47,7 +46,8 @@
 				var new_block_object = {block_state: "not_clicked",
 										block_type: temp_block_type,
 										block_coordinate_x: temp_coordinates['x'],
-										block_coordinate_y: temp_coordinates['y']};
+										block_coordinate_y: temp_coordinates['y'],
+										block_adjacent_bombs: 0};
 				
 				//push new blocks object to array
 				array_of_blocks.push(new_block_object);
@@ -75,7 +75,48 @@
 			}
 		
 			//testing purposes
-			//console.log(array_of_blocks);		
+			//console.log(array_of_blocks);	
+		}
+
+			block_bombs = bomb_blocks(array_of_blocks);
+
+		//needs to optimize too many loops
+		function countAdjacentMines() {        
+			for (var i = 0; i < array_of_blocks.length; i++){
+				for (var j = 0; j < array_of_blocks.length; j++){
+					if (!(array_of_blocks[i][j].block_type.bomb)){
+						var count = 0;
+
+						for (var p = i - 1; p <= i + 1; p++){
+							for (var q = j - 1; q <= j + 1; q++){
+								if (0 <= p && p < array_of_blocks.length && 0 <= q && q < array_of_blocks.length){
+									if (array_of_blocks[p][q].block_type.bomb)
+										++count;
+								}
+							}
+						}
+
+						array_of_blocks[i][j].block_adjacent_bombs(count);
+					}
+				} // end for loop rows
+			} // end for loop columns
+		} // end countAdjacentMines
+
+		function bomb_blocks(list) {
+			var bomb_blocks = [];
+			
+			//I'm getting an error here, so I'm just going to comment it out so there are no errors when I push
+			//We can fix on Saturday
+			
+			/*
+			list.foreach(function (item) {
+				if (item.block_type.bomb !== '') {
+					bomb_blocks.push(item.block_type.bomb);
+				}
+			});
+			*/
+			
+			return bomb_blocks;
 		}
 
 		//when a div with the class 'block' is clicked on
