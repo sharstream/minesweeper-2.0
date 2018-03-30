@@ -48,7 +48,7 @@
 				var new_block_object = {block_state: "not_clicked",
 										block_type: block_types[Math.floor(Math.random() * block_types.length)],
 										block_coordinates: temp_coordinates,
-										setAdjacentBombs:0};
+										block_adjacent_bombs:0};
 				
 				if (index_x % 9 === 0) {
 					index_x = 0;
@@ -93,7 +93,7 @@
 							}
 						}
 
-						array_of_blocks[i][j].setAdjacentBombs(count);
+						array_of_blocks[i][j].block_adjacent_bombs(count);
 					}
 				} // end for loop rows
 			} // end for loop columns
