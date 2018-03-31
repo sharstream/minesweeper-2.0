@@ -1,79 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Minesweeper 2.0</title>
-	<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script type="text/javascript" src="assets/javascript/app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
 
-</head>
-<body background="assets/images/dark-triangles.png" oncontextmenu="return false;" onload="generate_field()">
-<div class="container">
-	<div class="row form-inline">
-		<div class="col-lg-3 pull-right">
-			<div class="input-group">
-				<input type="text" class="form-control" placeholder="Username...">
-				<span class="input-group-btn">
-       <button type="button" class="btn btn-default">Sign In!</button>
-      </span>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Minesweeper 2.0</title>
+
+		<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+		<script type="text/javascript" src="assets/javascript/app.js"></script>
+	</head>
+
+	<body background="assets/images/dark-triangles.png" oncontextmenu="return false;" onload="generate_field()">
+		<div class="container">
+			<div class="row form-inline">
+				<div class="col-lg-3 pull-right">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Username...">
+
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default">Sign In!</button>
+						</span>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="jumbotron" id="jumbotron2">
+				<h1 class="display-4" >Minesweeper 2.0</h1>
+				<p class="lead"></p>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="mine_field"></div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<!-- Default panel contents -->
+				<div class="panel-heading" id="highScores">High Scores</div>
+				<div class="panel-body">
+
+					<!-- Table -->
+					<table class="table">
+						<thead>
+							<tr>
+								<th>head 1</th>
+								<th>head 2</th>
+								<th>head 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>first row</td>
+								<td>first row</td>
+								<td>first row</td>
+							</tr>
+							<tr>
+								<td>second row</td>
+								<td>second row</td>
+								<td>second row</td>
+							</tr>
+							<tr>
+								<td>third row</td>
+								<td>third row</td>
+								<td>third row</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
-	</div>
-
-
-	<div class="jumbotron" id="jumbotron2">
-		<h1 class="display-4" >Minesweeper 2.0</h1>
-		<p class="lead"></p>
-	</div>
-
-	<div class="panel panel-default">
-		<div class="panel-body">
-			<div class="mine_field"></div>
-
-		</div>
-	</div>
-
-
-	<div class="panel panel-default">
-		<!-- Default panel contents -->
-		<div class="panel-heading" id="highScores">High Scores</div>
-		<div class="panel-body">
-
-			<!-- Table -->
-			<table class="table">
-				<thead>
-				<tr>
-					<th>head 1</th>
-					<th>head 2</th>
-					<th>head 3</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-					<td>first row</td>
-					<td>first row</td>
-					<td>first row</td>
-				</tr>
-				<tr>
-					<td>second row</td>
-					<td>second row</td>
-					<td>second row</td>
-				</tr>
-				<tr>
-					<td>third row</td>
-					<td>third row</td>
-					<td>third row</td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-
-
 	</body>
 </html>
