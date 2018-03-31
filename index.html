@@ -1,94 +1,79 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Minesweeper 2.0</title>
+	<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/javascript/app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
 
-<html>
-	<head>
-		<link rel="stylesheet" href="assets/css/styles.css">
-
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	</head>
-	<body oncontextmenu="return false;">
-		<div class="game_container">
-			<div class="mine_field"></div>
+</head>
+<body background="assets/images/dark-triangles.png" oncontextmenu="return false;" onload="generate_field()">
+<div class="container">
+	<div class="row form-inline">
+		<div class="col-lg-3 pull-right">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Username...">
+				<span class="input-group-btn">
+       <button type="button" class="btn btn-default">Sign In!</button>
+      </span>
+			</div>
 		</div>
+	</div>
+
+
+	<div class="jumbotron" id="jumbotron2">
+		<h1 class="display-4" >Minesweeper 2.0</h1>
+		<p class="lead"></p>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="mine_field"></div>
+
+		</div>
+	</div>
+
+
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading" id="highScores">High Scores</div>
+		<div class="panel-body">
+
+			<!-- Table -->
+			<table class="table">
+				<thead>
+				<tr>
+					<th>head 1</th>
+					<th>head 2</th>
+					<th>head 3</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>first row</td>
+					<td>first row</td>
+					<td>first row</td>
+				</tr>
+				<tr>
+					<td>second row</td>
+					<td>second row</td>
+					<td>second row</td>
+				</tr>
+				<tr>
+					<td>third row</td>
+					<td>third row</td>
+					<td>third row</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
 	</body>
-	<script>
-		//array to store all the block objects in the mine_field container
-		var array_of_blocks = [];
-
-		//start field generation
-		generate_field();
-
-		//field generation function
-		function generate_field() {
-			//array of block types
-			var block_types = ["empty", "bomb", "hint"];
-
-			//generate 81 blocks (9 x 9 grid)
-			for (var i = 1; i < 82; i++) {
-				//reference to the mine_field container
-				var mine_field = $('.mine_field');
-				//creating a new block element
-				var new_block_div = $('<div>');
-				//creating a new block object with default block_state and random block_type values
-				var new_block_object = {block_state: "not_clicked",
-										block_type: block_types[Math.floor(Math.random() * block_types.length)]};
-
-				//push the new block to our block array
-				array_of_blocks.push(new_block_object);
-
-				//set data-state, data-type, class attributes, and background image of the new block element
-				new_block_div
-					.data('state', new_block_object.block_state)
-					.data('type', new_block_object.block_type)
-					.addClass('block')
-					.css('background-image', `url(assets/images/${new_block_object.block_state}.png)`);
-
-				//and append the new block element to the mine_field container
-				mine_field.append(new_block_div);
-			}
-		}
-
-		//when a div with the class 'block' is clicked on
-		$('.block').mousedown(function(event) {
-			switch (event.which) {
-				case 1:
-					//if it was a left click and the clicked block's data-state attribute is 'not_clicked'
-					if ($(this).data('state') === "not_clicked")
-						//set its data-state attribute to 'clicked' and change the background image of the block
-						$(this)
-							.data('state', 'clicked')
-							.css('background-image', 'url(assets/images/clicked.png)');
-
-					//I'm thinking here we should call a method that checks if the clicked block was a mine
-					//and perform the empty block crawl
-					//example: check_for_mines($(this));
-					//
-
-					break;
-				case 2:
-					//case for middle click (not used)
-					console.log("your scroll wheel button has no use here");
-
-					break;
-				case 3:
-					//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
-					if ($(this).data('state') === "not_clicked")
-						//set its data-state attribute to 'flagged' and change the background image of the block
-						$(this)
-							.data('state', 'flagged')
-							.css('background-image', 'url(assets/images/flagged.png)');
-					//if the clicked block's data-state attribute is already 'flagged'
-					else if ($(this).data('state') === "flagged")
-						//set its data-state attribute to 'not_clicked' and change the background image
-						$(this)
-							.data('state', 'not_clicked')
-							.css('background-image', 'url(assets/images/not_clicked.png)');
-
-					break;
-				default:
-					//default case (also not used)
-					console("how'd you manage to see this message? what kind of mouse is that?");
-			}
-		});
-	</script>
 </html>
