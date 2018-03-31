@@ -159,59 +159,7 @@ $(document).ready(function() {
                 console("how'd you manage to see this message? what kind of mouse is that?");
 
         }
-    });$('.block').mousedown(function(event) {
-        switch (event.which) {
-            case 1:
-                //if it was a left click and the clicked block's data-state attribute is 'not_clicked'
-                if ($(this).data('state') === "not_clicked")
-                //set its data-state attribute to 'clicked' and change the background image of the block
-                    $(this)
-                        .data('state', 'clicked')
-                        .css('background-image', 'url(assets/images/clicked.png)');
-
-                //determine if we clicked block was bomb
-                //or if we should perform the empty block crawl
-                //example below:
-                if ($(this).data('type') === "bomb")
-                    console.log("a bomb block was clicked!! - perform_bomb_clicked_method() " + "--- the bomb's coordinates were " + $(this).attr('id'));
-                else if ($(this).data('type') === "empty")
-                    console.log("an empty block was clicked - perform_the_empty_area_crawl_method() " + "--- the clicked block's coordinates were " + $(this).attr('id'));
+    })})
 
 
-                break;
-            case 2:
-                //case for middle click (not used)
-                console.log("your scroll wheel button has no use here");
-
-                break;
-            case 3:
-                //if it was a right click and the clicked block's data-state attribute is 'not_clicked'
-                console.log("right click!");
-                if ($(this).data('state') === "not_clicked") {
-                    number_of_flagged_blocks++;
-
-                    //set its data-state attribute to 'flagged' and change the background image of the block
-                    $(this)
-                        .data('state', 'flagged')
-                        .css('background-image', 'url(assets/images/flagged.png)');
-                }
-                //if the clicked block's data-state attribute is already 'flagged'
-                else if ($(this).data('state') === "flagged") {
-                    number_of_flagged_blocks--;
-
-                    //set its data-state attribute to 'not_clicked' and change the background image
-                    $(this)
-                        .data('state', 'not_clicked')
-                        .css('background-image', 'url(assets/images/not_clicked.png)');
-                }
-
-                break;
-            default:
-                //default case (also not used)
-                console("how'd you manage to see this message? what kind of mouse is that?");
-
-        }
-    });
-
-});
 
