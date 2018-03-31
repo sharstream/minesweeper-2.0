@@ -1,6 +1,26 @@
-body {
-	margin: auto;
-	padding: 0;
+
+
+.input-group{
+	text-align: right;
+	margin: 5%;
+}
+
+#jumbotron2 {
+	text-align: center;
+	background-color: dimgrey;
+	color: white;
+	font-family: 'Monoton', cursive;
+
+}
+
+#highScores{
+	text-align: center;
+	font-weight: bolder;
+
+}
+
+.panel-body{
+	display: flex;
 }
 
 .block {
@@ -8,14 +28,13 @@ body {
 	width: 20px;
 }
 
-.game_container {
-	margin: auto;
-	width: 180px;
-}
 
 .mine_field {
 	display: inline-flex;
 	flex-wrap: wrap;
 	text-align: center;
 	margin: auto;
+	width: 180px;
+	text-align: center;
+
 }
