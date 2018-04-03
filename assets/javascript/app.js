@@ -176,14 +176,12 @@ function reveal_bomb() {
 		
 		//scan until an unflagged bomb has been found, then flag it
 		$('.mine_field').children('.block').each(function () {
-			if (!found_one) {
-				if ($(this).data('type') === "bomb" && !($(this).data('state', 'flagged'))) {
-					found_one = true;
+			if (!found_one && $(this).data('type') === "bomb" && $(this).data('state') != 'flagged') {
+				found_one = true;
 
-					$(this)
-						.data('state', 'flagged')
-						.css('background-image', 'url(assets/images/flagged.png)');
-				}
+				$(this)
+					.data('state', 'flagged')
+					.css('background-image', 'url(assets/images/flagged.png)');
 			}
 		});
 	}
@@ -192,6 +190,10 @@ function reveal_bomb() {
 //power up that adds 30 seconds to the timer
 function add_time() {
 	seconds += 30;
+}
+
+function bomb_was_clicked() {
+	
 }
 
 //when a div with the class 'block' is clicked on
@@ -213,16 +215,15 @@ $(document).ready(function() {
 							.data('state', 'clicked')
 							.css('background-image', 'url(assets/images/clicked.png)');
 
-					//determine if we clicked block was bomb
-					//or if we should perform the empty block crawl
-					//example below:
-					if ($(this).data('type') === "bomb") {
+					//determine if block was a bomb or not
+					if ($(this).data('type') === "bomb" && $(this).data('state') !== "flagged") {
 						$(this)
 							.css('background-image', 'url(assets/images/bomb.png)');
 						
 						console.log("--- the bomb's coordinates were " + $(this).attr('id'));
-					} else if ($(this).data('type') === "empty")
+					} else if ($(this).data('type') === "empty") {
 						console.log("--- the clicked block's coordinates were " + $(this).attr('id'));
+					}
 				}
 
 				break;
