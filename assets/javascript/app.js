@@ -4,14 +4,25 @@ var number_of_bombs = 0;
 var number_of_flagged_blocks = 0;
 var block_bombs = [];
 var seconds = 120;
+//power up tracking
+var clear_row_selected = false, 
+	clear_row_used = false, 
+	clear_column_selected = false, 
+	clear_column_used = false, 
+	reveal_bomb_used = false,
+	add_time_used = false;
 
 //field generation function
 function generate_field() {
 	//array of block types, coordinate variables, and temp_coordinates object
-	var block_types = ["empty", "bomb"];
+	var block_types = ["empty", "empty", "empty", "empty", "empty", "empty", "empty", "empty", "empty", "bomb"];
 	var index_x = 0, index_y = 0;
 	var temp_coordinates = { "x": 0, "y": 0 };
 	var temp_block_type = "";
+	var number_of_bombs = 0;
+	
+	//reset power ups
+	clear_row_selected = false, clear_row_used = false, clear_column_selected = false, clear_column_used = false, reveal_bomb_used = false, add_time_used = false;
 
 	//generate 81 blocks (9 x 9 grid)
 	for (var i = 1; i < 82; i++) {
@@ -21,6 +32,14 @@ function generate_field() {
 		//set temporary block type (will need some kind of algorithm to limit number of bombs
 		//and make sure they are evenly spread throughout the field)
 		temp_block_type = block_types[Math.floor(Math.random() * block_types.length)];
+		
+		//determine frequency of bomb spawns
+		if (temp_block_type === "bomb") {
+			if (number_of_bombs > 9)
+				temp_block_type = "empty";
+			else
+				number_of_bombs++;
+		}
 
 		//reference to the mine_field container
 		var mine_field = $('.mine_field');
@@ -61,9 +80,6 @@ function generate_field() {
 			index_y++;
 		}
 	}
-
-	//testing purposes
-	//console.log(array_of_blocks);
 }
 
 //needs to optimize too many loops
@@ -84,9 +100,9 @@ function countAdjacentMines() {
 
 				array_of_blocks[i][j].block_adjacent_bombs(count);
 			}
-		} // end for loop rows
-	} // end for loop columns
-} // end countAdjacentMines
+		}
+	}
+}
 
 function startGameTimer () {
 	interval = setTimeout(startGameTimer, 1000);
@@ -118,28 +134,96 @@ function fancyTimeFormat(time) {
 	return ret;
 }
 
+//select clear method handles 'clear row' & 'clear column' power up data states
+function select_clear(axis) {
+	if (axis === 'row')
+		if (!clear_row_used)
+			clear_row_used = true, clear_row_selected = true;
+	
+	if (axis === 'column')
+		if (!clear_column_used)
+			clear_column_used = true, clear_column_selected = true;
+}
+
+//clear axis method handles UI state changes for 'clear row' & 'clear column' power ups
+function clear_axis(index, comparison) {
+	//for each element in the mine_field
+	$('.mine_field').children('.block').each(function () {
+		//check if the id's listed element coordinate matches that of the element that was clicked
+		if ($(this).attr('id').charAt(index) === comparison) {
+			//and if it's a bomb, flag it
+			if ($(this).data('type') === "bomb") {
+				$(this)
+					.data('state', 'flagged')
+					.css('background-image', 'url(assets/images/flagged.png)');
+			} else {
+				//otherwise, set it to be clicked
+				$(this)
+					.data('state', 'clicked')
+					.css('background-image', 'url(assets/images/clicked.png)');
+			}
+		}
+	});
+}
+
+//power up that reveals a single bomb
+function reveal_bomb() {
+	//check to see if the power up has been used
+	if (!reveal_bomb_used) {
+		reveal_bomb_used = true;
+		
+		var found_one = false;
+		
+		//scan until an unflagged bomb has been found, then flag it
+		$('.mine_field').children('.block').each(function () {
+			if (!found_one) {
+				if ($(this).data('type') === "bomb" && !($(this).data('state', 'flagged'))) {
+					found_one = true;
+
+					$(this)
+						.data('state', 'flagged')
+						.css('background-image', 'url(assets/images/flagged.png)');
+				}
+			}
+		});
+	}
+}
+
+//power up that adds 30 seconds to the timer
+function add_time() {
+	seconds += 30;
+}
+
 //when a div with the class 'block' is clicked on
 $(document).ready(function() {
 	$('body').on('mousedown', '.block', function(event) {
-		console.log("block clicked");
-
 		switch (event.which) {
 			case 1:
-				//if it was a left click and the clicked block's data-state attribute is 'not_clicked'
-				if ($(this).data('state') === "not_clicked")
-					//set its data-state attribute to 'clicked' and change the background image of the block
-					$(this)
-						.data('state', 'clicked')
-						.css('background-image', 'url(assets/images/clicked.png)');
+				if (clear_row_selected) {
+					clear_axis(2, $(this).attr('id').charAt(2));
+					clear_row_selected = false;
+				} else if (clear_column_selected) {
+					clear_axis(0, $(this).attr('id').charAt(0));
+					clear_column_selected = false;
+				} else {
+					//if it was a left click and the clicked block's data-state attribute is 'not_clicked'
+					if ($(this).data('state') === "not_clicked")
+						//set its data-state attribute to 'clicked' and change the background image of the block
+						$(this)
+							.data('state', 'clicked')
+							.css('background-image', 'url(assets/images/clicked.png)');
 
-				//determine if we clicked block was bomb
-				//or if we should perform the empty block crawl
-				//example below:
-				if ($(this).data('type') === "bomb")
-					console.log("a bomb block was clicked!! - perform_bomb_clicked_method() " + "--- the bomb's coordinates were " + $(this).attr('id'));
-				else if ($(this).data('type') === "empty")
-					console.log("an empty block was clicked - perform_the_empty_area_crawl_method() " + "--- the clicked block's coordinates were " + $(this).attr('id'));
-
+					//determine if we clicked block was bomb
+					//or if we should perform the empty block crawl
+					//example below:
+					if ($(this).data('type') === "bomb") {
+						$(this)
+							.css('background-image', 'url(assets/images/bomb.png)');
+						
+						console.log("--- the bomb's coordinates were " + $(this).attr('id'));
+					} else if ($(this).data('type') === "empty")
+						console.log("--- the clicked block's coordinates were " + $(this).attr('id'));
+				}
 
 				break;
 			case 2:
@@ -148,8 +232,6 @@ $(document).ready(function() {
 
 				break;
 			case 3:
-				console.log("blok right lcicked");
-
 				//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
 				if ($(this).data('state') === "not_clicked") {
 					number_of_flagged_blocks++;
