@@ -86,7 +86,7 @@ function generate_field() {
 }
 
 function calculateDistance(block_id) {
-	debugger
+	
 	var block_index_x = block_id.charAt(0);
 	var block_index_y = block_id.charAt(2);
 
@@ -125,7 +125,7 @@ function revealEmptyBlocks(array_of_empties) {
 
 //traverse the board
 function traverseBoard(empty_block, isBomb) {
-	debugger
+	
 	var empty_blocks = [];
 
 	isBomb = isBomb || function () {
