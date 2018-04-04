@@ -47,3 +47,11 @@
 	padding-top: .5%;
 	border: black solid 5px;
 }
+
+#lossModal {
+	text-align: center;
+}
+
+#winModal {
+	text-align: center;
+}
