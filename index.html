@@ -6,12 +6,13 @@
 
 		<title>Minesweeper 2.0</title>
 
-		<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Monoton|Orbitron" rel="stylesheet">
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
 		<script type="text/javascript" src="assets/javascript/firebase.js"></script>
 		<script type="text/javascript" src="assets/javascript/app.js"></script>
@@ -39,12 +40,14 @@
 
 			<div class="panel panel-default">
 				<div class="panel-body">
+					<h2 id="timerDisplay"></h2>
+					
 					<div class="powerups">
 						<input type="button" value="clear row" class="btn btn-success" onclick="select_clear('row')">
 						<input type="button" value="clear column" class="btn btn-success" onclick="select_clear('column')">
 						<input type="button" value="reveal bomb" class="btn btn-success" onclick="reveal_bomb()">
 						<input type="button" value="reveal bombs" class="autoflag btn btn-success">
-						<input type="button" value="add time" class="btn btn-success" onclick="add_time()">
+						<input type="button" value="add time" class="btn btn-success" id="addTime" onclick="add_time()">
 					</div>
 				</div>
 			</div>
@@ -87,6 +90,45 @@
 							</tr>
 						</tbody>
 					</table>
+				</div>
+			</div>
+		</div>
+		<!-- Game Loss Modal -->
+		<div class="modal fade" id="lossModal" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">You Lose!</h4>
+					</div>
+					<div class="modal-body">
+						<div id="gameOverAPI"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="winModal" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">You Win!</h4>
+					</div>
+					<div class="modal-body">
+						<div id="winAPI"></div>
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="username...">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary">Save changes</button>
+					</div>
 				</div>
 			</div>
 		</div>

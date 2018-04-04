@@ -5,7 +5,7 @@ var number_of_empties = 0;
 var bomb_limit = 10;
 var number_of_flagged_blocks = 0;
 var array_of_bombs = [];
-var seconds = 120;
+var seconds = 5;
 //power up tracking
 var clear_row_selected = false, 
 	clear_row_used = false, 
@@ -197,47 +197,70 @@ function plantBombs(array, bombsPlanted, limit) {
 	while (bombsPlanted <= limit) {
 		index_x = getRandomNumber(9);
 		index_y = getRandomNumber(9);
+		
 		var temp_obj = array[index_x][index_y];
+		
 		if (temp_obj.block_type !== "bomb") {
 			temp_obj['block_type'] = "bomb";
 			temp_obj['block_coordinate_x'] = index_x;
 			temp_obj['block_coordinate_y'] = index_y;
+			
 			//search for specific coordinates
 			$('#'+index_x + '-' + index_y).data('type',temp_obj.block_type);
+			
 			array[index_x][index_y] = temp_obj;
 			array_of_bombs.push(temp_obj);
+			
 			bombsPlanted++;
 		}
 	}
 }
 
-function startGameTimer() {
-	interval = setTimeout(startGameTimer, 1000);
+function startGameTimer () {
+	intervalId = setInterval(count, 1000);
+}
+
+function stopGameTimer(){
+	clearInterval(intervalId)
+}
+
+function count(){
 	seconds--;
-
-	console.log("Time Remaining: " + fancyTimeFormat(seconds));
-
+	
+	var converted = fancyTimeFormat(seconds);
+	
+	$("#timerDisplay").text(converted);
+	
 	if (seconds === 0) {
-		clearTimeout(interval);
-		console.log("Game Over!");
+		stopGameTimer();
+		console.log("You Lose!");
+		// gameOver();
+		// $('#lossModal').modal('show');
+		$('#winModal').modal('show');
+		
+		victory();
 	}
 }
 
-function fancyTimeFormat(time) {
+function add30seconds (){
+	seconds += 30;
+}
+
+function fancyTimeFormat(time) {   
 	// Hours, minutes and seconds
 	var hrs = ~~(time / 3600);
 	var mins = ~~((time % 3600) / 60);
 	var secs = time % 60;
 	// Output like "1:01" or "4:03:59" or "123:03:59"
 	var ret = "";
-
+	
 	if (hrs > 0) {
 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
 	}
-
+	
 	ret += "" + mins + ":" + (secs < 10 ? "0" : "");
 	ret += "" + secs;
-
+	
 	return ret;
 }
 
@@ -294,19 +317,51 @@ function reveal_bomb() {
 	}
 }
 
-//power up that adds 30 seconds to the timer
-function add_time() {
-	seconds += 30;
+function gameOver (){
+	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
+	
+	$.ajax({
+		url: queryURL,
+		method: "GET"
+	})
+		.then(function (response) {
+		console.log(queryURL);
+		console.log(response);
+		
+		var results = response.data;
+		var bombImage = $("<img>");
+		
+		bombImage.attr("src", results[0].images.fixed_height.url);
+		
+		$("#gameOverAPI").append(bombImage);
+	})
 }
 
-function bomb_was_clicked() {
-
+function victory (){
+	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
+	
+	$.ajax({
+		url: queryURL,
+		method: "GET"
+	})
+		.then(function (response) {
+		console.log(queryURL);
+		console.log(response);
+		
+		var results = response.data;
+		var partyImage = $("<img>");
+		
+		partyImage.attr("src", results[0].images.fixed_height.url);
+		
+		$("#winAPI").append(partyImage);
+	})
 }
 
 function autoRevealFlag(array_of_bombs) {
 
 	for (item of array_of_bombs) {
 		item['block_state'] = "flagged";
+		
 		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
 			.data('state', 'flagged')
 			.css('background-image', `url(assets/images/${item.block_state}.png)`);
@@ -329,20 +384,27 @@ function confirm_reset() {
 		reveal_bomb_used = false,
 		add_time_used = false;
 	dimension = 9;
+	
 	$('.mine_field').children().remove();
+	
 	generate_field();
+	
 	return confirm("GAME OVER click OK to start over again!");
 }
 
 //when a div with the class 'block' is clicked on
 $(document).ready(function() {
-
+	$("#timerDisplay").text("2:00");
+	
 	$('.autoflag').on('click', function (event) {
 
 		event.preventDefault();
 
 		autoRevealFlag(array_of_bombs);
 	});
+	
+	$( ".mine_field" ).one( "click", function() { startGameTimer(); });
+	$( "#addTime" ).one( "click", function() { add30seconds(); });
 
 	$('body').on('mousedown', '.block', function(event) {
 		switch (event.which) {

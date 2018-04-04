@@ -38,3 +38,12 @@
 	text-align: center;
 
 }
+
+#timerDisplay {
+	text-align: center;
+	font-family: 'Orbitron', sans-serif;
+	font-weight: bolder;
+	margin: 0 25px 0 25px;
+	padding-top: .5%;
+	border: black solid 5px;
+}
