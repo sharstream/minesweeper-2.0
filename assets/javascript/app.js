@@ -1,11 +1,7 @@
 //array to store all the block objects in the mine_field container
 var array_of_blocks = [];
-var number_of_bombs = 0; //ten bombs
-var number_of_empties = 0;
-var bomb_limit = 10;
-var number_of_flagged_blocks = 0;
 var array_of_bombs = [];
-var seconds = 5;
+var bomb_limit = 10;
 //power up tracking
 var clear_row_selected = false, 
 	clear_row_used = false, 
@@ -14,6 +10,10 @@ var clear_row_selected = false,
 	reveal_bomb_used = false,
 	add_time_used = false;
 var dimension = 9;
+var number_of_bombs = 0;
+var number_of_empties = 0;
+var number_of_flagged_blocks = 0;
+var seconds = 5;
 
 //field generation function
 function generate_field() {
@@ -24,6 +24,7 @@ function generate_field() {
 		"x": 0,
 		"y": 0
 	};
+	
 	var temp_block_type = "";
 
 	//generate 81 blocks (9 x 9 grid)
@@ -64,37 +65,22 @@ function generate_field() {
 
 			//and append the new block element to the mine_field container
 			mine_field.append(new_block_div);
-
-			//increment index_x
-			// index_x++;
-
-			// //unless index_x divided by 9 has a remainder of 0 (end of row)
-			// if (index_x % 9 === 0) {
-			// 	//then reset index_x and increment index_y (new row)
-			// 	index_x = 0;
-			// 	index_y++;
-			// }
 		}
 	}
 
+	//plant bombs in the minefield
 	plantBombs(array_of_blocks, number_of_bombs, bomb_limit);
-
-	//testing purposes
-	console.log(array_of_blocks);
-	console.log(array_of_bombs);	
-	console.log((array_of_blocks.length-1)*9);
 }
 
+//calculates distance searched from block clicked
 function calculateDistance(block_id) {
-	
 	var block_index_x = block_id.charAt(0);
 	var block_index_y = block_id.charAt(2);
 
 	var block_empty = array_of_blocks[block_index_x][block_index_y];
 
 	if (block_empty['block_type'] !== "bomb") {
-		var empties = traverseBoard(block_empty,
-									function (isBomb) {
+		var empties = traverseBoard(block_empty, function(isBomb) {
 			var bomb_type = isBomb['block_type'];
 			//Non inverted boolean so true boolean representation
 			return (!!(bomb_type === "bomb")) ? false : true;
@@ -113,10 +99,11 @@ function calculateDistance(block_id) {
 	}
 }
 
+//reveals empty blocks adjacent to the block clicked
 function revealEmptyBlocks(array_of_empties) {
-
 	for (item of array_of_empties) {
 		item['block_state'] = "clicked";
+		
 		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
 			.data('state', 'clicked')
 			.css('background-image', `url(assets/images/${item.block_state}.png)`);
@@ -125,12 +112,9 @@ function revealEmptyBlocks(array_of_empties) {
 
 //traverse the board
 function traverseBoard(empty_block, isBomb) {
-	
 	var empty_blocks = [];
 
-	isBomb = isBomb || function () {
-		return true;
-	};
+	isBomb = isBomb || function () { return true; };
 
 	var temp_coordinate_x = empty_block['block_coordinate_x'];
 	var temp_coordinate_y = empty_block['block_coordinate_y'];
@@ -185,21 +169,24 @@ function traverseBoard(empty_block, isBomb) {
 	return $.grep(empty_blocks, isBomb);
 }
 
+//returns a random number
 function getRandomNumber(max) {
 	var num = Math.floor((Math.random() * 1000) + 1) % max;
 	return (num === 0) ? getRandomNumber(max) : num; 
 }
 
+//plants bombs in the minefield
 function plantBombs(array, bombsPlanted, limit) {
-
 	var index_x, index_y;
 
+	//while the number of bombs planted is under the limit
 	while (bombsPlanted <= limit) {
 		index_x = getRandomNumber(9);
 		index_y = getRandomNumber(9);
 		
 		var temp_obj = array[index_x][index_y];
 		
+		//set appropriate data since that object/element became a bomb
 		if (temp_obj.block_type !== "bomb") {
 			temp_obj['block_type'] = "bomb";
 			temp_obj['block_coordinate_x'] = index_x;
@@ -216,6 +203,7 @@ function plantBombs(array, bombsPlanted, limit) {
 	}
 }
 
+//self-explanatory
 function startGameTimer () {
 	intervalId = setInterval(count, 1000);
 }
@@ -224,6 +212,7 @@ function stopGameTimer(){
 	clearInterval(intervalId)
 }
 
+//timer decrementation & associated checks/modifications
 function count(){
 	seconds--;
 	
@@ -242,12 +231,15 @@ function count(){
 	}
 }
 
-function add30seconds (){
+//add time powerup
+function add_time(){
 	seconds += 30;
+	
+	$('.add_time').css('opacity', 0.25);
 }
 
-function fancyTimeFormat(time) {   
-	// Hours, minutes and seconds
+//formatting the time displayed
+function fancyTimeFormat(time) {
 	var hrs = ~~(time / 3600);
 	var mins = ~~((time % 3600) / 60);
 	var secs = time % 60;
@@ -262,38 +254,6 @@ function fancyTimeFormat(time) {
 	ret += "" + secs;
 	
 	return ret;
-}
-
-//select clear method handles 'clear row' & 'clear column' power up data states
-function select_clear(axis) {
-	if (axis === 'row')
-		if (!clear_row_used)
-			clear_row_used = true, clear_row_selected = true;
-
-	if (axis === 'column')
-		if (!clear_column_used)
-			clear_column_used = true, clear_column_selected = true;
-}
-
-//clear axis method handles UI state changes for 'clear row' & 'clear column' power ups
-function clear_axis(index, comparison) {
-	//for each element in the mine_field
-	$('.mine_field').children('.block').each(function () {
-		//check if the id's listed element coordinate matches that of the element that was clicked
-		if ($(this).attr('id').charAt(index) === comparison) {
-			//and if it's a bomb, flag it
-			if ($(this).data('type') === "bomb") {
-				$(this)
-					.data('state', 'flagged')
-					.css('background-image', 'url(assets/images/flagged.png)');
-			} else {
-				//otherwise, set it to be clicked
-				$(this)
-					.data('state', 'clicked')
-					.css('background-image', 'url(assets/images/clicked.png)');
-			}
-		}
-	});
 }
 
 //power up that reveals a single bomb
@@ -312,19 +272,21 @@ function reveal_bomb() {
 				$(this)
 					.data('state', 'flagged')
 					.css('background-image', 'url(assets/images/flagged.png)');
+				
+				$('.reveal_bomb').css('opacity', 0.25);
 			}
 		});
 	}
 }
 
+//game over panel
 function gameOver (){
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
 	$.ajax({
 		url: queryURL,
 		method: "GET"
-	})
-		.then(function (response) {
+	}).then(function (response) {
 		console.log(queryURL);
 		console.log(response);
 		
@@ -334,9 +296,10 @@ function gameOver (){
 		bombImage.attr("src", results[0].images.fixed_height.url);
 		
 		$("#gameOverAPI").append(bombImage);
-	})
+	});
 }
 
+//victory panel
 function victory (){
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
@@ -354,11 +317,11 @@ function victory (){
 		partyImage.attr("src", results[0].images.fixed_height.url);
 		
 		$("#winAPI").append(partyImage);
-	})
+	});
 }
 
+//for testing purposes (flags all bombs)
 function autoRevealFlag(array_of_bombs) {
-
 	for (item of array_of_bombs) {
 		item['block_state'] = "flagged";
 		
@@ -368,8 +331,8 @@ function autoRevealFlag(array_of_bombs) {
 	};
 };
 
+//reset variables and UI states
 function confirm_reset() {
-	//reset entire game
 	array_of_blocks = [];
 	number_of_bombs = 0; //ten bombs
 	number_of_empties = 0;
@@ -386,16 +349,61 @@ function confirm_reset() {
 	dimension = 9;
 	
 	$('.mine_field').children().remove();
+	$('.clear_row').css('opacity', 1);
+	$('.clear_column').css('opacity', 1);
+	$('.reveal_bomb').css('opacity', 1);
+	$('.add_time').css('opacity', 1);
 	
 	generate_field();
 	
 	return confirm("GAME OVER click OK to start over again!");
 }
 
+//select clear method handles 'clear row' & 'clear column' power up data states
+function select_clear(axis) {
+	if (axis === 'row')
+		if (!clear_row_used) {
+			clear_row_used = true, clear_row_selected = true;
+			
+			$('.clear_row').css('opacity', 0.25);
+		}
+
+	if (axis === 'column')
+		if (!clear_column_used) {
+			clear_column_used = true, clear_column_selected = true;
+			
+			$('.clear_column').css('opacity', 0.25);
+		}
+}
+
+//clear axis method handles UI state changes for 'clear row' & 'clear column' power ups
+function clear_axis(index, comparison) {
+	//for each element in the mine_field
+	$('.mine_field').children('.block').each(function () {
+		console.log(index, comparison);
+		
+		//check if the id's listed element coordinate matches that of the element that was clicked
+		if ($(this).attr('id').charAt(index) === comparison) {
+			//and if it's a bomb, flag it
+			if ($(this).data('type') === "bomb") {
+				$(this)
+					.data('state', 'flagged')
+					.css('background-image', 'url(assets/images/flagged.png)');
+			} else {
+				//otherwise, set it to be clicked
+				$(this)
+					.data('state', 'clicked')
+					.css('background-image', 'url(assets/images/clicked.png)');
+			}
+		}
+	});
+}
+
 //when a div with the class 'block' is clicked on
 $(document).ready(function() {
 	$("#timerDisplay").text("2:00");
 	
+	//for testing purposes (flags all bombs)
 	$('.autoflag').on('click', function (event) {
 
 		event.preventDefault();
@@ -403,17 +411,20 @@ $(document).ready(function() {
 		autoRevealFlag(array_of_bombs);
 	});
 	
+	//set up timer functions
 	$( ".mine_field" ).one( "click", function() { startGameTimer(); });
-	$( "#addTime" ).one( "click", function() { add30seconds(); });
 
 	$('body').on('mousedown', '.block', function(event) {
 		switch (event.which) {
 			case 1:
+				//see if a click determined powerup is active
 				if (clear_row_selected) {
-					clear_axis(0, $(this).attr('id').charAt(2));
+					console.log($(this).attr('id').charAt(0));
+					console.log($(this).attr('id').charAt(2));
+					clear_axis(0, $(this).attr('id').charAt(0));
 					clear_row_selected = false;
 				} else if (clear_column_selected) {
-					clear_axis(2, $(this).attr('id').charAt(0));
+					clear_axis(2, $(this).attr('id').charAt(2));
 					clear_column_selected = false;
 				} else {
 					//if it was a left click and the clicked block's data-state attribute is 'not_clicked'
@@ -425,16 +436,12 @@ $(document).ready(function() {
 
 					//determine if block was a bomb or not
 					if ($(this).data('type') === "bomb" && $(this).data('state') !== "flagged") {
-						console.log("a bomb block was clicked!! - perform_bomb_clicked_method() " + "--- the bomb's coordinates were " + $(this).attr('id'));
 						$(this)
 							.data('state', 'clicked')
 							.css('background-image', 'url(assets/images/bomb.png)');
 
 						confirm_reset();
-
-						console.log("--- the bomb's coordinates were " + $(this).attr('id'));
 					} else if ($(this).data('type') === "empty") {
-						console.log("--- the clicked block's coordinates were " + $(this).attr('id'));
 						calculateDistance($(this).attr('id'));
 					}
 				}
