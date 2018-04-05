@@ -10,6 +10,13 @@ var clear_row_selected = false,
 	reveal_bomb_used = false,
 	add_time_used = false;
 var dimension = 9;
+var new_block_object = {
+	block_state: "not_clicked",
+	block_type: "",
+	block_coordinate_x: 0,
+	block_coordinate_y: 0,
+	block_adyacent_empties: 0
+};
 var number_of_bombs = 0;
 var number_of_empties = 0;
 var number_of_flagged_blocks = 0;
@@ -44,7 +51,7 @@ function generate_field() {
 			var new_block_div = $('<div>');
 
 			//creating a new block object with default block_state and random block_type values
-			var new_block_object = {
+			new_block_object = {
 				block_state: "not_clicked",
 				block_type: temp_block_type,
 				block_coordinate_x: temp_coordinates['x'],
@@ -92,10 +99,10 @@ function calculateDistance(block_id) {
 		}
 
 		revealEmptyBlocks(empties);
-
-		if (number_of_empties === ((array_of_blocks.length - 1) * 9 - array_of_bombs.length)) {
-			alert('WIN');
-		}
+		
+//		if (number_of_empties === ((array_of_blocks.length - 1) * 9 - array_of_bombs.length)) {
+//			alert('WIN');
+//		}
 	}
 }
 
@@ -114,55 +121,65 @@ function revealEmptyBlocks(array_of_empties) {
 function traverseBoard(empty_block, isBomb) {
 	var empty_blocks = [];
 
-	isBomb = isBomb || function () { return true; };
+	isBomb = isBomb || function () {
+		return true;
+	};
 
 	var temp_coordinate_x = empty_block['block_coordinate_x'];
 	var temp_coordinate_y = empty_block['block_coordinate_y'];
 	// traverse up
 	if (temp_coordinate_x > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]);
 	}
 
 	// traverse down
 	if (temp_coordinate_x <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
 	}
 
 	// traverse left
 	if (temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]);
 	}
 
 	// traverse right
 	if (temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
 	}
 
 	// traverse upper left
 	if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse lower left
 	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse upper right
 	if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
 	}
 
 	// traverse lower right
 	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
 	}
 
@@ -460,6 +477,16 @@ $(document).ready(function() {
 					$(this)
 						.data('state', 'flagged')
 						.css('background-image', 'url(assets/images/flagged.png)');
+					
+					new_block_object = {
+						block_state: "flagged",
+						block_type: "flagged",
+						block_coordinate_x: $(this).attr('id').charAt(0),
+						block_coordinate_y: $(this).attr('id').charAt(2),
+						block_adyacent_empties: 0
+					};
+					
+					array_of_blocks[new_block_object.block_coordinate_x][new_block_object.block_coordinate_y] = new_block_object;
 				}
 				//if the clicked block's data-state attribute is already 'flagged'
 				else if ($(this).data('state') === "flagged") {
@@ -469,6 +496,16 @@ $(document).ready(function() {
 					$(this)
 						.data('state', 'not_clicked')
 						.css('background-image', 'url(assets/images/not_clicked.png)');
+					
+					new_block_object = {
+						block_state: "not_clicked",
+						block_type: "empty",
+						block_coordinate_x: $(this).attr('id').charAt(0),
+						block_coordinate_y: $(this).attr('id').charAt(2),
+						block_adyacent_empties: 0
+					};
+					
+					array_of_blocks[$(this).charAt(0)][$(this).charAt(2)] = new_block_object;
 				}
 
 				break;
