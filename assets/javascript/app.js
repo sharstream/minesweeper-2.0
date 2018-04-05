@@ -86,7 +86,7 @@ function generate_field() {
 }
 
 function calculateDistance(block_id) {
-
+	
 	var block_index_x = block_id.charAt(0);
 	var block_index_y = block_id.charAt(2);
 
@@ -125,7 +125,7 @@ function revealEmptyBlocks(array_of_empties) {
 
 //traverse the board
 function traverseBoard(empty_block, isBomb) {
-
+	
 	var empty_blocks = [];
 
 	isBomb = isBomb || function () {
@@ -141,7 +141,7 @@ function traverseBoard(empty_block, isBomb) {
 	}
 
 	// traverse down
-	if (temp_coordinate_x < dimension - 1 &&
+	if (temp_coordinate_x <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
 	}
@@ -153,31 +153,31 @@ function traverseBoard(empty_block, isBomb) {
 	}
 
 	// traverse right
-	if (temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
 	}
 
 	// traverse upper left
 	if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_y - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_y - 1][temp_coordinate_y - 1]);
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
+		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse lower left
-	if (temp_coordinate_x < dimension - 1 && temp_coordinate_y > 1 &&
+	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse upper right
-	if (temp_coordinate_x > 1 && temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
 	}
 
 	// traverse lower right
-	if (temp_coordinate_x < dimension - 1 && temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
 	}
@@ -378,11 +378,11 @@ function confirm_reset() {
 	array_of_bombs = [];
 	seconds = 120;
 	clear_row_selected = false,
-		clear_row_used = false,
-		clear_column_selected = false,
-		clear_column_used = false,
-		reveal_bomb_used = false,
-		add_time_used = false;
+	clear_row_used = false,
+	clear_column_selected = false,
+	clear_column_used = false,
+	reveal_bomb_used = false,
+	add_time_used = false;
 	dimension = 9;
 	
 	$('.mine_field').children().remove();
