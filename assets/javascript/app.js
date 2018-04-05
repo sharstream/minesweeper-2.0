@@ -141,7 +141,7 @@ function traverseBoard(empty_block, isBomb) {
 	}
 
 	// traverse down
-	if (temp_coordinate_x < dimension - 1 &&
+	if (temp_coordinate_x <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
 	}
@@ -153,31 +153,31 @@ function traverseBoard(empty_block, isBomb) {
 	}
 
 	// traverse right
-	if (temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
 	}
 
 	// traverse upper left
 	if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_y - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
+		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse lower left
-	if (temp_coordinate_x < dimension - 1 && temp_coordinate_y > 1 &&
+	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
 	}
 
 	// traverse upper right
-	if (temp_coordinate_x > 1 && temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
 	}
 
 	// traverse lower right
-	if (temp_coordinate_x < dimension - 1 && temp_coordinate_y < dimension - 1 &&
+	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
 		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
 		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
 	}
