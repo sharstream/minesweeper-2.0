@@ -6,6 +6,7 @@ Project 1
 * Dave Perez
 * David Toler
 * Shazia Jiwani
+* Aaron Chapman
 
 # What's Minesweeper 2.0?
 Minesweeper 2.0 is minesweeper like you've never played it before. An arsenal of powerups that aid you in flagging mines, and the urgency of being on the clock provide for a fun, fast-paced take on the classic game we all love (or hate)
