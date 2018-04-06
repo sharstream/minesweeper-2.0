@@ -94,13 +94,13 @@ function calculateDistance(block_id) {
 			return (!!(bomb_type === "bomb")) ? false : true;
 		});
 
-		number_of_empties = isNaN(number_of_empties) ? 0 : number_of_empties;
-		number_of_empties += empties.length + 1;
-		block_empty['block_adyacent_empties'] = empties.length;
+		if (block_empty['block_state'] !== 'flagged' && block_empty['block_state'] !== 'clicked') {
+			number_of_empties = isNaN(number_of_empties) ? 0 : number_of_empties;
+			number_of_empties += empties.length + 1;
+			block_empty['block_adyacent_empties'] = empties.length;
 
-		// console.log( ((array_of_blocks.length - 1) * 9) - array_of_bombs.length);
-
-		revealEmptyBlocks(empties);
+			revealEmptyBlocks(empties);
+		}
 
 		var total_blocks = ((array_of_blocks.length - 1) * 9);
 		var bombs_length = array_of_bombs.length;
@@ -108,8 +108,6 @@ function calculateDistance(block_id) {
 
 		console.log('total of blocks empties: '+subtract_op);
 		console.log('numbers of empties: '+number_of_empties);
-		
-
 
 		if (number_of_empties === subtract_op) {
 			victory();
@@ -323,13 +321,15 @@ function gameOver (){
 		bombImage.attr("src", results[0].images.fixed_height.url);
 		
 		$("#gameOverAPI").append(bombImage);
+
+		$('#lossModal').modal('show');
 	});
 }
 
 //victory panel
 function victory (){
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
-	debugger
+	
 	$.ajax({
 		url: queryURL,
 		method: "GET"
@@ -376,6 +376,10 @@ function confirm_reset() {
 	reveal_bomb_used = false,
 	add_time_used = false;
 	dimension = 9;
+  	
+	$("#lossModal").on("hidden.bs.modal", function(){
+	    $("#gameOverAPI").html("");
+	});
 	
 	$('.mine_field').children().remove();
 	$('.clear_row').css('opacity', 1);
@@ -405,6 +409,7 @@ function select_clear(axis) {
 
 //clear axis method handles UI state changes for 'clear row' & 'clear column' power ups
 function clear_axis(index, comparison) {
+	
 	//for each element in the mine_field
 	$('.mine_field').children('.block').each(function () {
 		console.log(index, comparison);
@@ -416,8 +421,12 @@ function clear_axis(index, comparison) {
 				$(this)
 					.data('state', 'flagged')
 					.css('background-image', 'url(assets/images/flagged.png)');
-			} else {
+			} else if($(this).data('type') === "empty"){
 				//otherwise, set it to be clicked
+				if ($(this).data('state') !== "clicked") {
+					number_of_empties++;
+				}	
+				console.log(number_of_empties);
 				$(this)
 					.data('state', 'clicked')
 					.css('background-image', 'url(assets/images/clicked.png)');
@@ -480,6 +489,7 @@ $(document).ready(function() {
 
 				break;
 			case 3:
+
 				//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
 				if ($(this).data('state') === "not_clicked") {
 					number_of_flagged_blocks++;
@@ -516,7 +526,7 @@ $(document).ready(function() {
 						block_adyacent_empties: 0
 					};
 					
-					array_of_blocks[$(this).charAt(0)][$(this).charAt(2)] = new_block_object;
+					array_of_blocks[$(this).attr('id').charAt(0)][$(this).attr('id').charAt(2)] = new_block_object;
 				}
 
 				break;
