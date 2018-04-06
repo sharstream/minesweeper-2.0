@@ -11,16 +11,7 @@ $(document).ready(function () {
 	
 	firebase.initializeApp(config);
 	
-	// Maybe include to clean up login on page load, if so put it in the app.js file
-	/*
-        $("#loginEmail").val("");
-        $("#loginPassword").val("");
-        $("#loginEmail").hide();
-        $("#loginPassword").hide();
-        $("#signInBtn").hide();
-        $("#createAccountBtn").hide();
-        $("#logoutBtn").hide();
-*/
+
 	// make vars for the database and the nodes the data will be stored in
 	var database = firebase.database();
 	var databaseRef = database.ref();
@@ -74,6 +65,8 @@ $(document).ready(function () {
 			$("#signInBtn").hide();
 			$("#createAccountBtn").hide();
 			$("#logoutBtn").show();
+			$("#winnerNickname").show();
+			$("#saveWinnerData").show();
 
 			// grabs the user info on sign in and gets the user's username from the JSON
 			userInfo = firebaseUser;
@@ -88,6 +81,8 @@ $(document).ready(function () {
 			$("#signInBtn").show();
 			$("#createAccountBtn").show();
 			$("#logoutBtn").hide();
+			$("#winnerNickname").hide();
+			$("#saveWinnerData").hide();
 		}
 	});
 	
