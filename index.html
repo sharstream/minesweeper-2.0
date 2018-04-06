@@ -110,12 +110,12 @@
 					<div class="modal-body">
 						<div id="winAPI"></div>
 						<div class="input-group">
-							<input type="text" class="form-control" placeholder="username...">
+							<input type="text" class="form-control" id="winnerNickname" placeholder="What's Your Nickname?">
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn btn-primary" id="saveWinnerData">Save Your Score!</button>
 					</div>
 				</div>
 			</div>
@@ -159,4 +159,10 @@
 			</div>
 		</div>
 	</body>
+	<script>
+		var numberOfClicks = 0;
+		$('body').on('mousedown', '.block', function(event) { 
+			numberOfClicks++; 
+		});
+	</script>
 </html>

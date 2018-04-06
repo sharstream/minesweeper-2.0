@@ -96,7 +96,7 @@ $(document).ready(function () {
 		event.preventDefault();
 		// grab user input data. Firebase stores data as a string by default so the score needs to be inside a parseInt to store as a number
 		var nickname = $("#winnerNickname").val(); 
-		var winnerScore = Math.floor(Math.random() * (21 - 7 + 1)) + 7;
+		var winnerScore = numberOfClicks;
 		// parseInt($();
 		// put user input in object then push it to the database
 		var newTest = {
