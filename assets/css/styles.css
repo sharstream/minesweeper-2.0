@@ -27,8 +27,13 @@
 	margin-right: 0;
 }
 
+#createAccountBtn {
+	border-radius: 0 5px 5px 0;
+}
+
 #loginEmail {
 	margin-right: 0.5%;
+	border-radius: 5px 0 0 5px;
 }
 
 #loginPassword {
@@ -52,6 +57,13 @@
 
 .powerups input {
 	margin: 25px 12.5px 0px 12.5px;
+	background-color: #6774AF;
+	border: none;
+	outline: none !important;
+}
+
+.powerups input:active, .powerups input:hover,  .powerups input:focus {
+	background-color: #6774AF;
 }
 
 .powerups_panel {
@@ -108,4 +120,8 @@
 
 #winModal {
 	text-align: center;
+}
+
+.autoflag {
+	background: palevioletred !important;
 }
