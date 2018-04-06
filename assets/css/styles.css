@@ -20,6 +20,16 @@
 #authenticationElements {
 	display: flex;
 	justify-content: right;
+	margin-right: 0;
+}
+
+#loginEmail {
+	margin-right: 0.5%;
+}
+
+#loginPassword {
+	margin-right: 1%;
+	margin-left: 0.5%;
 }
 
 .panel-body {
