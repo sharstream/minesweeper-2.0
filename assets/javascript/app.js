@@ -102,14 +102,14 @@ function calculateDistance(block_id) {
 			revealEmptyBlocks(empties);
 		}
 
-		var total_blocks = ((array_of_blocks.length - 1) * 9);
-		var bombs_length = array_of_bombs.length;
-		var subtract_op = total_blocks - bombs_length;
+		var temp_empties = 0;
+		
+		$('.mine_field').children('.block').each(function () {
+			if ($(this).data('state') === "not_clicked")
+				temp_empties++;
+		});
 
-		console.log('total of blocks empties: '+subtract_op);
-		console.log('numbers of empties: '+number_of_empties);
-
-		if (number_of_empties === subtract_op) {
+		if (temp_empties === 0) {
 			victory();
 		}
 	}
@@ -354,7 +354,9 @@ function autoRevealFlag(array_of_bombs) {
 	for (item of array_of_bombs) {
 		item['block_state'] = "flagged";
 		
-		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
+		var element_id = "#" + item['block_coordinate_x'] + "-" + item['block_coordinate_y'];
+		
+		$(element_id)
 			.data('state', 'flagged')
 			.css('background-image', `url(assets/images/${item.block_state}.png)`);
 	};
