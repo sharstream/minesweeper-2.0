@@ -1,4 +1,4 @@
-.input-group{
+.input-group {
 	text-align: right;
 	margin: 5%;
 }
@@ -11,13 +11,18 @@
 
 }
 
-#highScores{
+#highScores {
 	text-align: center;
 	font-weight: bolder;
 
 }
 
-.panel-body{
+#authenticationElements {
+	display: flex;
+	justify-content: right;
+}
+
+.panel-body {
 	display: flex;
 }
 
