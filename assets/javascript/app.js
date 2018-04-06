@@ -1,6 +1,6 @@
 //array to store all the block objects in the mine_field container
 var array_of_blocks = [];
-var array_of_bombs = [];
+var array_of_bombs = [];	
 var bomb_limit = 10;
 //power up tracking
 var clear_row_selected = false, 
@@ -20,7 +20,7 @@ var new_block_object = {
 var number_of_bombs = 0;
 var number_of_empties = 0;
 var number_of_flagged_blocks = 0;
-var seconds = 5;
+var seconds = 120;
 
 //field generation function
 function generate_field() {
@@ -81,6 +81,7 @@ function generate_field() {
 
 //calculates distance searched from block clicked
 function calculateDistance(block_id) {
+	
 	var block_index_x = block_id.charAt(0);
 	var block_index_y = block_id.charAt(2);
 
@@ -93,16 +94,26 @@ function calculateDistance(block_id) {
 			return (!!(bomb_type === "bomb")) ? false : true;
 		});
 
-		if (empties.length > 0) {
-			number_of_empties += empties.length + 1;
-			block_empty['block_adyacent_empties'] = empties.length;
-		}
+		number_of_empties = isNaN(number_of_empties) ? 0 : number_of_empties;
+		number_of_empties += empties.length + 1;
+		block_empty['block_adyacent_empties'] = empties.length;
+
+		// console.log( ((array_of_blocks.length - 1) * 9) - array_of_bombs.length);
 
 		revealEmptyBlocks(empties);
+
+		var total_blocks = ((array_of_blocks.length - 1) * 9);
+		var bombs_length = array_of_bombs.length;
+		var subtract_op = total_blocks - bombs_length;
+
+		console.log('total of blocks empties: '+subtract_op);
+		console.log('numbers of empties: '+number_of_empties);
 		
-//		if (number_of_empties === ((array_of_blocks.length - 1) * 9 - array_of_bombs.length)) {
-//			alert('WIN');
-//		}
+
+
+		if (number_of_empties === subtract_op) {
+			victory();
+		}
 	}
 }
 
@@ -242,7 +253,6 @@ function count(){
 		console.log("You Lose!");
 		// gameOver();
 		// $('#lossModal').modal('show');
-		$('#winModal').modal('show');
 		
 		victory();
 	}
@@ -319,7 +329,7 @@ function gameOver (){
 //victory panel
 function victory (){
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
-	
+	debugger
 	$.ajax({
 		url: queryURL,
 		method: "GET"
@@ -334,6 +344,8 @@ function victory (){
 		partyImage.attr("src", results[0].images.fixed_height.url);
 		
 		$("#winAPI").append(partyImage);
+
+		$('#winModal').modal('show');
 	});
 }
 
@@ -372,8 +384,6 @@ function confirm_reset() {
 	$('.add_time').css('opacity', 1);
 	
 	generate_field();
-	
-	return confirm("GAME OVER click OK to start over again!");
 }
 
 //select clear method handles 'clear row' & 'clear column' power up data states
@@ -458,6 +468,7 @@ $(document).ready(function() {
 							.css('background-image', 'url(assets/images/bomb.png)');
 
 						confirm_reset();
+						gameOver();
 					} else if ($(this).data('type') === "empty") {
 						calculateDistance($(this).attr('id'));
 					}
