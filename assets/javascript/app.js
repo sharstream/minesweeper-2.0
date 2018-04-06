@@ -18,10 +18,10 @@ var new_block_object = {
 	block_adyacent_empties: 0
 };
 var number_of_bombs = 0;
-var number_of_empties = 0;
 var number_of_flagged_blocks = 0;
 var intervalId = 0;
 var seconds = 120;
+var temp_empties = 0;
 
 //field generation function
 function generate_field() {
@@ -87,6 +87,8 @@ function calculateDistance(block_id) {
 	var block_index_y = block_id.charAt(2);
 
 	var block_empty = array_of_blocks[block_index_x][block_index_y];
+	
+	console.log(block_empty);
 
 	if (block_empty['block_type'] !== "bomb") {
 		var empties = traverseBoard(block_empty, function(isBomb) {
@@ -96,21 +98,20 @@ function calculateDistance(block_id) {
 		});
 
 		if (block_empty['block_state'] !== 'flagged' && block_empty['block_state'] !== 'clicked') {
-			number_of_empties = isNaN(number_of_empties) ? 0 : number_of_empties;
-			number_of_empties += empties.length + 1;
-			block_empty['block_adyacent_empties'] = empties.length;
-
+			if (empties === undefined)
+				empties = [];
+			
 			revealEmptyBlocks(empties);
 		}
 
-		var temp_empties = 0;
+		temp_empties = 0;
 		
 		$('.mine_field').children('.block').each(function () {
-			if ($(this).data('state') === "not_clicked")
+			if ($(this).data('state') === "clicked")
 				temp_empties++;
 		});
 
-		if (temp_empties === 0) {
+		if (temp_empties === 70) {
 			victory();
 		}
 	}
@@ -118,82 +119,86 @@ function calculateDistance(block_id) {
 
 //reveals empty blocks adjacent to the block clicked
 function revealEmptyBlocks(array_of_empties) {
-	for (item of array_of_empties) {
-		item['block_state'] = "clicked";
-		
-		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
-			.data('state', 'clicked')
-			.css('background-image', `url(assets/images/${item.block_state}.png)`);
-	};
+	if (array_of_empties) {
+		for (item of array_of_empties) {
+			item['block_state'] = "clicked";
+
+			$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
+				.data('state', 'clicked')
+				.css('background-image', `url(assets/images/${item.block_state}.png)`);
+		};
+	}
 };
 
 //traverse the board
 function traverseBoard(empty_block, isBomb) {
-	var empty_blocks = [];
+	if (temp_empties < 69) {
+		var empty_blocks = [];
 
-	isBomb = isBomb || function () {
-		return true;
-	};
+		isBomb = isBomb || function () {
+			return true;
+		};
 
-	var temp_coordinate_x = empty_block['block_coordinate_x'];
-	var temp_coordinate_y = empty_block['block_coordinate_y'];
-	// traverse up
-	if (temp_coordinate_x > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]);
+		var temp_coordinate_x = parseInt(empty_block['block_coordinate_x']);
+		var temp_coordinate_y = parseInt(empty_block['block_coordinate_y']);
+		// traverse up
+		if (temp_coordinate_x > 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]);
+		}
+
+		// traverse down
+		if (temp_coordinate_x <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
+		}
+
+		// traverse left
+		if (temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]);
+		}
+
+		// traverse right
+		if (temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
+		}
+
+		// traverse upper left
+		if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
+		}
+
+		// traverse lower left
+		if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
+		}
+
+		// traverse upper right
+		if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
+		}
+
+		// traverse lower right
+		if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
+		}
+
+		return $.grep(empty_blocks, isBomb);
 	}
-
-	// traverse down
-	if (temp_coordinate_x <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
-	}
-
-	// traverse left
-	if (temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]);
-	}
-
-	// traverse right
-	if (temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
-	}
-
-	// traverse upper left
-	if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
-	}
-
-	// traverse lower left
-	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
-	}
-
-	// traverse upper right
-	if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
-	}
-
-	// traverse lower right
-	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
-	}
-
-	return $.grep(empty_blocks, isBomb);
 }
 
 //returns a random number
@@ -361,7 +366,6 @@ function autoRevealFlag(array_of_bombs) {
 function confirm_reset() {
 	array_of_blocks = [];
 	number_of_bombs = 0; //ten bombs
-	number_of_empties = 0;
 	bomb_limit = 10;
 	number_of_flagged_blocks = 0;
 	array_of_bombs = [];
@@ -410,8 +414,6 @@ function clear_axis(index, comparison) {
 	
 	//for each element in the mine_field
 	$('.mine_field').children('.block').each(function () {
-		console.log(index, comparison);
-		
 		//check if the id's listed element coordinate matches that of the element that was clicked
 		if ($(this).attr('id').charAt(index) === comparison) {
 			//and if it's a bomb, flag it
@@ -421,10 +423,6 @@ function clear_axis(index, comparison) {
 					.css('background-image', 'url(assets/images/flagged.png)');
 			} else if($(this).data('type') === "empty"){
 				//otherwise, set it to be clicked
-				if ($(this).data('state') !== "clicked") {
-					number_of_empties++;
-				}	
-				console.log(number_of_empties);
 				$(this)
 					.data('state', 'clicked')
 					.css('background-image', 'url(assets/images/clicked.png)');
@@ -533,10 +531,12 @@ $(document).ready(function() {
 					new_block_object = {
 						block_state: "not_clicked",
 						block_type: "empty",
-						block_coordinate_x: $(this).attr('id').charAt(0),
-						block_coordinate_y: $(this).attr('id').charAt(2),
+						block_coordinate_x: parseInt($(this).attr('id').charAt(0)),
+						block_coordinate_y: parseInt($(this).attr('id').charAt(2)),
 						block_adyacent_empties: 0
 					};
+					
+					console.log(new_block_object);
 					
 					array_of_blocks[$(this).attr('id').charAt(0)][$(this).attr('id').charAt(2)] = new_block_object;
 				}
