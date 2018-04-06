@@ -242,18 +242,10 @@ function stopGameTimer(){
 function count(){
 	seconds--;
 	
-	var converted = fancyTimeFormat(seconds);
+	$("#timerDisplay").text(fancyTimeFormat(seconds));
 	
-	$("#timerDisplay").text(converted);
-	
-	if (seconds === 0) {
-		stopGameTimer();
-		console.log("You Lose!");
-		// gameOver();
-		// $('#lossModal').modal('show');
-		
-		victory();
-	}
+	if (seconds === 0)
+		gameOver();
 }
 
 //add time powerup
@@ -305,29 +297,30 @@ function reveal_bomb() {
 }
 
 //game over panel
-function gameOver (){
+function gameOver(){
+	stopGameTimer();
+	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
 	$.ajax({
 		url: queryURL,
 		method: "GET"
 	}).then(function (response) {
-		console.log(queryURL);
-		console.log(response);
-		
 		var results = response.data;
 		var bombImage = $("<img>");
 		
 		bombImage.attr("src", results[0].images.fixed_height.url);
 		
+		$("#gameOverAPI").children().remove();
 		$("#gameOverAPI").append(bombImage);
-
 		$('#lossModal').modal('show');
 	});
 }
 
 //victory panel
-function victory (){
+function victory(){
+	stopGameTimer();
+	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
 	$.ajax({
@@ -335,16 +328,13 @@ function victory (){
 		method: "GET"
 	})
 		.then(function (response) {
-		console.log(queryURL);
-		console.log(response);
-		
 		var results = response.data;
 		var partyImage = $("<img>");
 		
 		partyImage.attr("src", results[0].images.fixed_height.url);
 		
+		$("#winAPI").children().remove();
 		$("#winAPI").append(partyImage);
-
 		$('#winModal').modal('show');
 	});
 }
@@ -379,19 +369,14 @@ function confirm_reset() {
 	add_time_used = false;
 	dimension = 9;
   	
-	$("#lossModal").on("hidden.bs.modal", function(){
-	    $("#gameOverAPI").html("");
-	});
-
-	$("#winModal").on("hidden.bs.modal", function(){
-	    $("#winAPI").html("");
-	});
-	
-	$('.mine_field').children().remove();
+	$("#lossModal").on("hidden.bs.modal", function(){ $("#gameOverAPI").html(""); });
+	$("#winModal").on("hidden.bs.modal", function(){ $("#winAPI").html(""); });
+	$("#timerDisplay").text(fancyTimeFormat(seconds));
 	$('.clear_row').css('opacity', 1);
 	$('.clear_column').css('opacity', 1);
 	$('.reveal_bomb').css('opacity', 1);
 	$('.add_time').css('opacity', 1);
+	$('.mine_field').children().remove();
 	
 	generate_field();
 }
@@ -457,6 +442,23 @@ $(document).ready(function() {
 	$( ".mine_field" ).one( "click", function() { startGameTimer(); });
 
 	$('body').on('mousedown', '.block', function(event) {
+		var should_rotate = getRandomNumber(100);
+
+		console.log(should_rotate);
+		
+		if (should_rotate >= 70) {
+			if ($('.mine_field').hasClass('mine_field_right_rotation')) {
+				$('.mine_field').removeClass('mine_field_right_rotation');
+			} else if ($('.mine_field').hasClass('mine_field_left_rotation')) {
+				$('.mine_field').removeClass('mine_field_left_rotation');
+			} else {
+				if (should_rotate >= 85)
+					$('.mine_field').addClass('mine_field_right_rotation');
+				else
+					$('.mine_field').addClass('mine_field_left_rotation');
+			}
+		}
+		
 		switch (event.which) {
 			case 1:
 				//see if a click determined powerup is active
@@ -539,7 +541,6 @@ $(document).ready(function() {
 			default:
 				//default case (also not used)
 				console("how'd you manage to see this message? what kind of mouse is that?");
-
 		}
 	});
 });
