@@ -11,6 +11,10 @@
 
 }
 
+#gameOverAPI img {
+	border-radius: 10px;
+}
+
 #highScores {
 	text-align: center;
 	font-weight: bolder;

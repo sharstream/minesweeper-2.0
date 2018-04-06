@@ -20,6 +20,7 @@ var new_block_object = {
 var number_of_bombs = 0;
 var number_of_empties = 0;
 var number_of_flagged_blocks = 0;
+var intervalId = 0;
 var seconds = 120;
 
 //field generation function
@@ -235,7 +236,7 @@ function startGameTimer () {
 }
 
 function stopGameTimer(){
-	clearInterval(intervalId)
+	clearInterval(intervalId);
 }
 
 //timer decrementation & associated checks/modifications
@@ -299,6 +300,7 @@ function reveal_bomb() {
 //game over panel
 function gameOver(){
 	stopGameTimer();
+	confirm_reset();
 	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
@@ -314,12 +316,15 @@ function gameOver(){
 		$("#gameOverAPI").children().remove();
 		$("#gameOverAPI").append(bombImage);
 		$('#lossModal').modal('show');
+
+		$("#gameOverAPI img").addClass('shake-opacity shake-constant');
 	});
 }
 
 //victory panel
 function victory(){
 	stopGameTimer();
+	confirm_reset();
 	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
@@ -368,6 +373,7 @@ function confirm_reset() {
 	reveal_bomb_used = false,
 	add_time_used = false;
 	dimension = 9;
+	intervalId = 0;
   	
 	$("#lossModal").on("hidden.bs.modal", function(){ $("#gameOverAPI").html(""); });
 	$("#winModal").on("hidden.bs.modal", function(){ $("#winAPI").html(""); });
@@ -376,6 +382,7 @@ function confirm_reset() {
 	$('.clear_column').css('opacity', 1);
 	$('.reveal_bomb').css('opacity', 1);
 	$('.add_time').css('opacity', 1);
+	$('.mine_field').removeClass('mine_field_left_rotation mine_field_right_rotation');
 	$('.mine_field').children().remove();
 	
 	generate_field();
@@ -439,12 +446,10 @@ $(document).ready(function() {
 	});
 	
 	//set up timer functions
-	$( ".mine_field" ).one( "click", function() { startGameTimer(); });
+	$( ".mine_field" ).on( "click", function() { if (intervalId === 0) { startGameTimer(); } });
 
 	$('body').on('mousedown', '.block', function(event) {
 		var should_rotate = getRandomNumber(100);
-
-		console.log(should_rotate);
 		
 		if (should_rotate >= 70) {
 			if ($('.mine_field').hasClass('mine_field_right_rotation')) {
@@ -484,7 +489,6 @@ $(document).ready(function() {
 							.data('state', 'clicked')
 							.css('background-image', 'url(assets/images/bomb.png)');
 
-						confirm_reset();
 						gameOver();
 					} else if ($(this).data('type') === "empty") {
 						calculateDistance($(this).attr('id'));
