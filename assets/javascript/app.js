@@ -380,6 +380,10 @@ function confirm_reset() {
 	$("#lossModal").on("hidden.bs.modal", function(){
 	    $("#gameOverAPI").html("");
 	});
+
+	$("#winModal").on("hidden.bs.modal", function(){
+	    $("#winAPI").html("");
+	});
 	
 	$('.mine_field').children().remove();
 	$('.clear_row').css('opacity', 1);
