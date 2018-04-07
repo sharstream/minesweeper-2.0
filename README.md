@@ -23,6 +23,7 @@ This project uses the following:
 * Firebase
 * The Giphy API
 * [CSShake](http://elrumordelaluz.github.io/csshake/)
+* Flickr API
 
 # Who Did What?
 Dave Perez wrangled:
