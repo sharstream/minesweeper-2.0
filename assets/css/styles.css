@@ -1,3 +1,11 @@
+#wrongLogin {
+	color:red; 
+	float: right;
+	margin: 1px; 
+	font-size: 20px; 
+	visibility: hidden;
+}
+
 .input-group {
 	text-align: right;
 	margin: 5%;
@@ -120,8 +128,4 @@
 
 #winModal {
 	text-align: center;
-}
-
-.autoflag {
-	background: palevioletred !important;
 }

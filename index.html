@@ -32,12 +32,12 @@
 							<button type="button" class="btn btn-default" id="logoutBtn">Log Out</button>
 						</span>
 					</div>
+					<p id="wrongLogin"></p>
 				</div>
 			</div>
 
-
 			<div class="jumbotron" id="jumbotron2">
-				<h1 class="display-4" >Minesweeper 2.0</h1>
+				<h1 class="display-4 autoflag">Minesweeper 2.0</h1>
 				<p class="lead"></p>
 			</div>
 
@@ -49,7 +49,6 @@
 						<input type="button" value="clear row" class="btn btn-success clear_row" onclick="select_clear('row')">
 						<input type="button" value="clear column" class="btn btn-success clear_column" onclick="select_clear('column')">
 						<input type="button" value="reveal bomb" class="btn btn-success reveal_bomb" onclick="reveal_bomb()">
-						<input type="button" value="reveal bombs" class="autoflag btn btn-success">
 						<input type="button" value="add time" class="btn btn-success add_time" id="addTime" onclick="add_time()">
 					</div>
 

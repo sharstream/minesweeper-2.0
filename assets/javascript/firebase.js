@@ -28,7 +28,7 @@ $(document).ready(function () {
 		var pass = $("#loginPassword").val().trim();
 		var auth = firebase.auth();
 		var loginPromise = auth.signInWithEmailAndPassword(email, pass);
-		loginPromise.catch( e => $('#loginModal2').modal('show'));
+		loginPromise.catch( e => $("#wrongLogin").css("visibility","visible").html("Please enter a valid email and password."));
 	});
 	
 	// Have user create account, PLEASE NOTE!!! There is a bug in Chrome where you will get an error message that says:
@@ -44,7 +44,8 @@ $(document).ready(function () {
 			var loginPromise = auth.createUserWithEmailAndPassword(email, pass);
 			loginPromise.catch( e => console.log(e.message));  
 		} else {
-			$('#loginModal').modal('show');
+			//$('#loginModal').modal('show');
+			$("#wrongLogin").css("visibility","visible").html("Please enter a valid email, password must have capital letter lowercase letter and a number");
 			$("#loginEmail").val("");
 			$("#loginPassword").val("");
 		} 
@@ -60,6 +61,7 @@ $(document).ready(function () {
 	firebase.auth().onAuthStateChanged(firebaseUser => { 
 		if(firebaseUser) {
 			// hide all buttons when logged in
+			$("#wrongLogin").css("visibility","hidden");
 			$("#loginEmail").hide();
 			$("#loginPassword").hide();
 			$("#signInBtn").hide();
@@ -74,6 +76,7 @@ $(document).ready(function () {
 
 		} else {
 			// hide the logout button by default
+			$("#wrongLogin").css("visibility","hidden");
 			$("#loginEmail").val("");
 			$("#loginPassword").val("");
 			$("#loginEmail").show();
