@@ -1,6 +1,6 @@
 //array to store all the block objects in the mine_field container
 var array_of_blocks = [];
-var array_of_bombs = [];
+var array_of_bombs = [];	
 var bomb_limit = 10;
 //power up tracking
 var clear_row_selected = false, 
@@ -10,10 +10,18 @@ var clear_row_selected = false,
 	reveal_bomb_used = false,
 	add_time_used = false;
 var dimension = 9;
+var new_block_object = {
+	block_state: "not_clicked",
+	block_type: "",
+	block_coordinate_x: 0,
+	block_coordinate_y: 0,
+	block_adyacent_empties: 0
+};
 var number_of_bombs = 0;
-var number_of_empties = 0;
 var number_of_flagged_blocks = 0;
-var seconds = 5;
+var intervalId = 0;
+var seconds = 120;
+var temp_empties = 0;
 
 //field generation function
 function generate_field() {
@@ -44,7 +52,7 @@ function generate_field() {
 			var new_block_div = $('<div>');
 
 			//creating a new block object with default block_state and random block_type values
-			var new_block_object = {
+			new_block_object = {
 				block_state: "not_clicked",
 				block_type: temp_block_type,
 				block_coordinate_x: temp_coordinates['x'],
@@ -74,10 +82,13 @@ function generate_field() {
 
 //calculates distance searched from block clicked
 function calculateDistance(block_id) {
+	
 	var block_index_x = block_id.charAt(0);
 	var block_index_y = block_id.charAt(2);
 
 	var block_empty = array_of_blocks[block_index_x][block_index_y];
+	
+	console.log(block_empty);
 
 	if (block_empty['block_type'] !== "bomb") {
 		var empties = traverseBoard(block_empty, function(isBomb) {
@@ -86,87 +97,108 @@ function calculateDistance(block_id) {
 			return (!!(bomb_type === "bomb")) ? false : true;
 		});
 
-		if (empties.length > 0) {
-			number_of_empties += empties.length + 1;
-			block_empty['block_adyacent_empties'] = empties.length;
+		if (block_empty['block_state'] !== 'flagged' && block_empty['block_state'] !== 'clicked') {
+			if (empties === undefined)
+				empties = [];
+			
+			revealEmptyBlocks(empties);
 		}
 
-		revealEmptyBlocks(empties);
+		temp_empties = 0;
+		
+		$('.mine_field').children('.block').each(function () {
+			if ($(this).data('state') === "clicked")
+				temp_empties++;
+		});
 
-		if (number_of_empties === ((array_of_blocks.length - 1) * 9 - array_of_bombs.length)) {
-			alert('WIN');
+		if (temp_empties === 70) {
+			victory();
 		}
 	}
 }
 
 //reveals empty blocks adjacent to the block clicked
 function revealEmptyBlocks(array_of_empties) {
-	for (item of array_of_empties) {
-		item['block_state'] = "clicked";
-		
-		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
-			.data('state', 'clicked')
-			.css('background-image', `url(assets/images/${item.block_state}.png)`);
-	};
+	if (array_of_empties) {
+		for (item of array_of_empties) {
+			item['block_state'] = "clicked";
+
+			$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
+				.data('state', 'clicked')
+				.css('background-image', `url(assets/images/${item.block_state}.png)`);
+		};
+	}
 };
 
 //traverse the board
 function traverseBoard(empty_block, isBomb) {
-	var empty_blocks = [];
+	if (temp_empties < 69) {
+		var empty_blocks = [];
 
-	isBomb = isBomb || function () { return true; };
+		isBomb = isBomb || function () {
+			return true;
+		};
 
-	var temp_coordinate_x = empty_block['block_coordinate_x'];
-	var temp_coordinate_y = empty_block['block_coordinate_y'];
-	// traverse up
-	if (temp_coordinate_x > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]);
+		var temp_coordinate_x = parseInt(empty_block['block_coordinate_x']);
+		var temp_coordinate_y = parseInt(empty_block['block_coordinate_y']);
+		// traverse up
+		if (temp_coordinate_x > 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y]);
+		}
+
+		// traverse down
+		if (temp_coordinate_x <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
+		}
+
+		// traverse left
+		if (temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]);
+		}
+
+		// traverse right
+		if (temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
+		}
+
+		// traverse upper left
+		if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
+		}
+
+		// traverse lower left
+		if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
+		}
+
+		// traverse upper right
+		if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
+		}
+
+		// traverse lower right
+		if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked" &&
+			array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "flagged") {
+			empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
+		}
+
+		return $.grep(empty_blocks, isBomb);
 	}
-
-	// traverse down
-	if (temp_coordinate_x <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y]);
-	}
-
-	// traverse left
-	if (temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y - 1]);
-	}
-
-	// traverse right
-	if (temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x][temp_coordinate_y + 1]);
-	}
-
-	// traverse upper left
-	if (temp_coordinate_x > 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y - 1]);
-	}
-
-	// traverse lower left
-	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y > 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y - 1]);
-	}
-
-	// traverse upper right
-	if (temp_coordinate_x > 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x - 1][temp_coordinate_y + 1]);
-	}
-
-	// traverse lower right
-	if (temp_coordinate_x <= dimension - 1 && temp_coordinate_y <= dimension - 1 &&
-		array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]['block_state'] !== "clicked") {
-		empty_blocks.push(array_of_blocks[temp_coordinate_x + 1][temp_coordinate_y + 1]);
-	}
-
-	return $.grep(empty_blocks, isBomb);
 }
 
 //returns a random number
@@ -209,26 +241,17 @@ function startGameTimer () {
 }
 
 function stopGameTimer(){
-	clearInterval(intervalId)
+	clearInterval(intervalId);
 }
 
 //timer decrementation & associated checks/modifications
 function count(){
 	seconds--;
 	
-	var converted = fancyTimeFormat(seconds);
+	$("#timerDisplay").text(fancyTimeFormat(seconds));
 	
-	$("#timerDisplay").text(converted);
-	
-	if (seconds === 0) {
-		stopGameTimer();
-		console.log("You Lose!");
-		// gameOver();
-		// $('#lossModal').modal('show');
-		$('#winModal').modal('show');
-		
-		victory();
-	}
+	if (seconds === 0)
+		gameOver();
 }
 
 //add time powerup
@@ -280,27 +303,34 @@ function reveal_bomb() {
 }
 
 //game over panel
-function gameOver (){
+function gameOver(){
+	stopGameTimer();
+	confirm_reset();
+	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
 	$.ajax({
 		url: queryURL,
 		method: "GET"
 	}).then(function (response) {
-		console.log(queryURL);
-		console.log(response);
-		
 		var results = response.data;
 		var bombImage = $("<img>");
 		
 		bombImage.attr("src", results[0].images.fixed_height.url);
 		
+		$("#gameOverAPI").children().remove();
 		$("#gameOverAPI").append(bombImage);
+		$('#lossModal').modal('show');
+
+		$("#gameOverAPI img").addClass('shake-opacity shake-constant');
 	});
 }
 
 //victory panel
-function victory (){
+function victory(){
+	stopGameTimer();
+	confirm_reset();
+	
 	var queryURL = "https://api.giphy.com/v1/gifs/search?q=party&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
 	
 	$.ajax({
@@ -308,15 +338,14 @@ function victory (){
 		method: "GET"
 	})
 		.then(function (response) {
-		console.log(queryURL);
-		console.log(response);
-		
 		var results = response.data;
 		var partyImage = $("<img>");
 		
 		partyImage.attr("src", results[0].images.fixed_height.url);
 		
+		$("#winAPI").children().remove();
 		$("#winAPI").append(partyImage);
+		$('#winModal').modal('show');
 	});
 }
 
@@ -325,7 +354,9 @@ function autoRevealFlag(array_of_bombs) {
 	for (item of array_of_bombs) {
 		item['block_state'] = "flagged";
 		
-		$('#' + item['block_coordinate_x'] + '-' + item['block_coordinate_y'])
+		var element_id = "#" + item['block_coordinate_x'] + "-" + item['block_coordinate_y'];
+		
+		$(element_id)
 			.data('state', 'flagged')
 			.css('background-image', `url(assets/images/${item.block_state}.png)`);
 	};
@@ -335,7 +366,6 @@ function autoRevealFlag(array_of_bombs) {
 function confirm_reset() {
 	array_of_blocks = [];
 	number_of_bombs = 0; //ten bombs
-	number_of_empties = 0;
 	bomb_limit = 10;
 	number_of_flagged_blocks = 0;
 	array_of_bombs = [];
@@ -347,16 +377,19 @@ function confirm_reset() {
 	reveal_bomb_used = false,
 	add_time_used = false;
 	dimension = 9;
-	
-	$('.mine_field').children().remove();
+	intervalId = 0;
+  	
+	$("#lossModal").on("hidden.bs.modal", function(){ $("#gameOverAPI").html(""); });
+	$("#winModal").on("hidden.bs.modal", function(){ $("#winAPI").html(""); });
+	$("#timerDisplay").text(fancyTimeFormat(seconds));
 	$('.clear_row').css('opacity', 1);
 	$('.clear_column').css('opacity', 1);
 	$('.reveal_bomb').css('opacity', 1);
 	$('.add_time').css('opacity', 1);
+	$('.mine_field').removeClass('mine_field_left_rotation mine_field_right_rotation');
+	$('.mine_field').children().remove();
 	
 	generate_field();
-	
-	return confirm("GAME OVER click OK to start over again!");
 }
 
 //select clear method handles 'clear row' & 'clear column' power up data states
@@ -378,10 +411,9 @@ function select_clear(axis) {
 
 //clear axis method handles UI state changes for 'clear row' & 'clear column' power ups
 function clear_axis(index, comparison) {
+	
 	//for each element in the mine_field
 	$('.mine_field').children('.block').each(function () {
-		console.log(index, comparison);
-		
 		//check if the id's listed element coordinate matches that of the element that was clicked
 		if ($(this).attr('id').charAt(index) === comparison) {
 			//and if it's a bomb, flag it
@@ -389,7 +421,7 @@ function clear_axis(index, comparison) {
 				$(this)
 					.data('state', 'flagged')
 					.css('background-image', 'url(assets/images/flagged.png)');
-			} else {
+			} else if($(this).data('type') === "empty"){
 				//otherwise, set it to be clicked
 				$(this)
 					.data('state', 'clicked')
@@ -412,9 +444,24 @@ $(document).ready(function() {
 	});
 	
 	//set up timer functions
-	$( ".mine_field" ).one( "click", function() { startGameTimer(); });
+	$( ".mine_field" ).on( "click", function() { if (intervalId === 0) { startGameTimer(); } });
 
 	$('body').on('mousedown', '.block', function(event) {
+		var should_rotate = getRandomNumber(100);
+		
+		if (should_rotate >= 70) {
+			if ($('.mine_field').hasClass('mine_field_right_rotation')) {
+				$('.mine_field').removeClass('mine_field_right_rotation');
+			} else if ($('.mine_field').hasClass('mine_field_left_rotation')) {
+				$('.mine_field').removeClass('mine_field_left_rotation');
+			} else {
+				if (should_rotate >= 85)
+					$('.mine_field').addClass('mine_field_right_rotation');
+				else
+					$('.mine_field').addClass('mine_field_left_rotation');
+			}
+		}
+		
 		switch (event.which) {
 			case 1:
 				//see if a click determined powerup is active
@@ -440,7 +487,7 @@ $(document).ready(function() {
 							.data('state', 'clicked')
 							.css('background-image', 'url(assets/images/bomb.png)');
 
-						confirm_reset();
+						gameOver();
 					} else if ($(this).data('type') === "empty") {
 						calculateDistance($(this).attr('id'));
 					}
@@ -452,6 +499,7 @@ $(document).ready(function() {
 
 				break;
 			case 3:
+
 				//if it was a right click and the clicked block's data-state attribute is 'not_clicked'
 				if ($(this).data('state') === "not_clicked") {
 					number_of_flagged_blocks++;
@@ -460,6 +508,16 @@ $(document).ready(function() {
 					$(this)
 						.data('state', 'flagged')
 						.css('background-image', 'url(assets/images/flagged.png)');
+					
+					new_block_object = {
+						block_state: "flagged",
+						block_type: "flagged",
+						block_coordinate_x: $(this).attr('id').charAt(0),
+						block_coordinate_y: $(this).attr('id').charAt(2),
+						block_adyacent_empties: 0
+					};
+					
+					array_of_blocks[new_block_object.block_coordinate_x][new_block_object.block_coordinate_y] = new_block_object;
 				}
 				//if the clicked block's data-state attribute is already 'flagged'
 				else if ($(this).data('state') === "flagged") {
@@ -469,13 +527,24 @@ $(document).ready(function() {
 					$(this)
 						.data('state', 'not_clicked')
 						.css('background-image', 'url(assets/images/not_clicked.png)');
+					
+					new_block_object = {
+						block_state: "not_clicked",
+						block_type: "empty",
+						block_coordinate_x: parseInt($(this).attr('id').charAt(0)),
+						block_coordinate_y: parseInt($(this).attr('id').charAt(2)),
+						block_adyacent_empties: 0
+					};
+					
+					console.log(new_block_object);
+					
+					array_of_blocks[$(this).attr('id').charAt(0)][$(this).attr('id').charAt(2)] = new_block_object;
 				}
 
 				break;
 			default:
 				//default case (also not used)
 				console("how'd you manage to see this message? what kind of mouse is that?");
-
 		}
 	});
 });

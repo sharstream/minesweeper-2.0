@@ -9,6 +9,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Monoton|Orbitron" rel="stylesheet">
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
+		<link rel="stylesheet" href="https://oylo.info/css/csshake.css">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
@@ -21,12 +22,14 @@
 	<body background="assets/images/dark-triangles.png" oncontextmenu="return false;" onload="generate_field()">
 		<div class="container">
 			<div class="row form-inline">
-				<div class="col-lg-3 pull-right">
-					<div class="input-group">
-						<input type="email" class="form-control" placeholder="Username..." validate>
-
+				<div class="col-lg-7 pull-right">
+					<div class="input-group" id="authenticationElements">
+						<input type="text" class="form-control" id="loginEmail" placeholder="Email...">
+						<input type="password" class="form-control" id="loginPassword" placeholder="Password...">
 						<span class="input-group-btn">
-							<button type="button" class="validate_email btn btn-default">Sign In!</button>
+							<button type="button" class="btn btn-default" id="signInBtn">Sign In!</button>
+							<button type="button" class="btn btn-default" id="createAccountBtn">Create Account!</button>
+							<button type="button" class="btn btn-default" id="logoutBtn">Log Out</button>
 						</span>
 					</div>
 				</div>
@@ -64,32 +67,16 @@
 				<!-- Default panel contents -->
 				<div class="panel-heading" id="highScores">High Scores</div>
 				<div class="panel-body">
-
 					<!-- Table -->
-					<table class="table">
-						<thead>
-							<tr>
-								<th>head 1</th>
-								<th>head 2</th>
-								<th>head 3</th>
-							</tr>
-						</thead>
+					<table class="table" id="scoreTable">
 						<tbody>
-							<tr>
-								<td>first row</td>
-								<td>first row</td>
-								<td>first row</td>
-							</tr>
-							<tr>
-								<td>second row</td>
-								<td>second row</td>
-								<td>second row</td>
-							</tr>
-							<tr>
-								<td>third row</td>
-								<td>third row</td>
-								<td>third row</td>
-							</tr>
+							<thead>
+								<tr>
+									<th>Nickname:</th>
+									<th>Score:</th>
+									<th>Date:</th>
+								</tr>
+							</thead>
 						</tbody>
 					</table>
 				</div>
@@ -124,15 +111,59 @@
 					<div class="modal-body">
 						<div id="winAPI"></div>
 						<div class="input-group">
-							<input type="text" class="form-control" placeholder="username...">
+							<input type="text" class="form-control" id="winnerNickname" placeholder="What's Your Nickname?">
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn btn-primary" id="saveWinnerData">Save Your Score!</button>
+					</div>
+				</div>
+			</div>
+			<!-- login Modal -->
+			<div class="modal fade" id="loginModal" role="dialog">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Error</h4>
+						</div>
+						<div class="modal-body">
+							<p>Please enter a valid email and password.</p>
+							<br>
+							<p>The password must have at least one number, one lowercase letter, one uppercase letter, and be eight characters long</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- login Modal 2 -->
+			<div class="modal fade" id="loginModal2" role="dialog">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Error</h4>
+						</div>
+						<div class="modal-body">
+							<p>Please create an account.</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</body>
+	<script>
+		var numberOfClicks = 0;
+		$('body').on('mousedown', '.block', function(event) { 
+			numberOfClicks++; 
+		});
+	</script>
 </html>
