@@ -302,48 +302,48 @@ function reveal_bomb() {
 	}
 }
 
-function gameOver(){
-	stopGameTimer();
-	confirm_reset();
-
-	var queryURL = "http://api.flickr.com/services/rest/?&method=flickr.people.getPublicPhotos&api_key=d99c7440d075321835a40777e9c40cdd&user_id=163803425@N07&per_page=1&page=1&format=json&jsoncallback=?";
-	$.ajax({
-		url: queryURL,
-		method: "GET"
-	}).then(function (response) {
-		console.log(response);
-		var bombImage = $("<img>");
-		bombImage.attr("src", "http://farm1.static.flickr.com/809/41286667511_cf88bbd0d1_z.jpg");
-		$("#gameOverAPI").children().remove();
-		$("#gameOverAPI").append(bombImage);
-		$('#lossModal').modal('show');
-		$("#gameOverAPI img").addClass('shake-opacity shake-constant');
-	});
-}
-
-//game over panel
 //function gameOver(){
 //	stopGameTimer();
 //	confirm_reset();
-//	
-//	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
-//	
+//
+//	var queryURL = "http://api.flickr.com/services/rest/?&method=flickr.people.getPublicPhotos&api_key=d99c7440d075321835a40777e9c40cdd&user_id=163803425@N07&per_page=1&page=1&format=json&jsoncallback=?";
 //	$.ajax({
 //		url: queryURL,
 //		method: "GET"
 //	}).then(function (response) {
-//		var results = response.data;
+//		console.log(response);
 //		var bombImage = $("<img>");
-//		
-//		bombImage.attr("src", results[0].images.fixed_height.url);
-//		
+//		bombImage.attr("src", "http://farm1.static.flickr.com/809/41286667511_cf88bbd0d1_z.jpg");
 //		$("#gameOverAPI").children().remove();
 //		$("#gameOverAPI").append(bombImage);
 //		$('#lossModal').modal('show');
-//
 //		$("#gameOverAPI img").addClass('shake-opacity shake-constant');
 //	});
 //}
+
+//game over panel
+function gameOver(){
+	stopGameTimer();
+	confirm_reset();
+	
+	var queryURL = "https://api.giphy.com/v1/gifs/search?q=explosion&api_key=8SiJFznIRJb7dPaUfhjlnV6WeHfe66rt&limit=1";
+	
+	$.ajax({
+		url: queryURL,
+		method: "GET"
+	}).then(function (response) {
+		var results = response.data;
+		var bombImage = $("<img>");
+		
+		bombImage.attr("src", results[0].images.fixed_height.url);
+		
+		$("#gameOverAPI").children().remove();
+		$("#gameOverAPI").append(bombImage);
+		$('#lossModal').modal('show');
+
+		$("#gameOverAPI img").addClass('shake-opacity shake-constant');
+	});
+}
 
 //victory panel
 function victory(){
